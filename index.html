@@ -286,11 +286,16 @@
   .row:hover{transform:translateY(-1px); box-shadow:0 5px 14px rgba(130,96,64,.13);}
   .row:active{cursor:grabbing;}
   .row.dragging{opacity:.35;}
+  /* 长按满 380ms 才解锁拖动，这之前给个「可以拖了」的手感 */
+  .row.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
+  .chip.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
   .row .grip{color:#D5C9B9; font-size:11px; flex:none;}
   .row .bar{width:3px; height:15px; border-radius:2px; flex:none; background:var(--c);}
   .row .txt{flex:1; min-width:0; font-size:12.5px; line-height:1.35; cursor:text;
             overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .row .est{font-size:10.5px; color:var(--ink3); flex:none;}
+  .row .at{font-size:10px; color:#fff; background:var(--c); flex:none;
+           padding:1px 5px; border-radius:6px; font-weight:600; opacity:.85;}
   .row .done-min{font-size:9.5px; color:#3AA184; flex:none;}
   .row .play{
     border:0; background:transparent; color:#C9BCAC; cursor:pointer; font-size:10px;
@@ -567,6 +572,29 @@
   }
   .sheet .sh-title:focus{border-color:#F0A879;}
   .sheet .sh-title::placeholder{color:#CFC3B3;}
+  /* ---- 开始时间：填了就顺手排进时间轴 ---- */
+  .sheet .startrow{display:flex; align-items:center; gap:7px; margin-top:13px; flex-wrap:wrap;}
+  .sheet .startrow .flabel{font-size:12px; color:var(--ink3); flex:none;}
+  .sheet .tinput{
+    display:flex; align-items:center; background:#FAF6F0;
+    border:1px solid var(--line2); border-radius:11px; padding:3px 9px;
+    transition:border-color .15s, background .15s;
+  }
+  .sheet .tinput:focus-within{border-color:#F0A879; background:#fff;}
+  .sheet .tinput input[type=time]{
+    font:inherit; font-size:13.5px; font-weight:600; border:0; background:transparent;
+    outline:none; color:var(--ink); width:76px; padding:5px 0;
+  }
+  .sheet .tinput input[type=time]::-webkit-calendar-picker-indicator{cursor:pointer; opacity:.45;}
+  .sheet .qk{
+    border:1px solid var(--line2); background:#fff; color:var(--ink3); cursor:pointer;
+    font-size:11.5px; padding:6px 10px; border-radius:9px; flex:none;
+    transition:background .15s, color .15s, transform .15s var(--bounce);
+  }
+  .sheet .qk:hover{background:#F8F1E8; color:var(--ink2); transform:translateY(-1px);}
+  .sheet .sh-hint{font-size:10.5px; color:#C4B8A8; margin-top:6px;}
+  .sheet .sh-hint b{color:var(--now); font-weight:600;}
+
   .sheet .footrow{display:flex; align-items:center; gap:10px; margin-top:14px;}
   .sheet .footrow .flabel{font-size:12px; color:var(--ink3); flex:none;}
   .sheet .stepper{
@@ -745,7 +773,7 @@ body.side-collapsed .side-open-btn{ display:none; }
 </style>
 </head>
 <body>
-<script>window.BOOT = {"kinds":[{"key":"talk","name":"对话","emoji":"💬","color":"#FF8A5B","soft":"#FFF0E8","min":30},{"key":"meet","name":"会面","emoji":"🤝","color":"#35C29A","soft":"#E7F8F2","min":60},{"key":"partner","name":"伙伴会面","emoji":"👥","color":"#6C8CFF","soft":"#EDF1FF","min":60},{"key":"review","name":"复盘","emoji":"🔍","color":"#E86AA6","soft":"#FDEDF5","min":30},{"key":"audio","name":"读书音频","emoji":"🎧","color":"#E8A33D","soft":"#FFF6E8","min":30},{"key":"php","name":"回php","emoji":"💻","color":"#4FB6C4","soft":"#EAF7F9","min":30}],"other":{"key":"other","name":"其他","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"}};</script>
+<script>window.BOOT = {"kinds":[{"key":"talk","name":"对话","emoji":"💬","color":"#FF8A5B","soft":"#FFF0E8","min":30},{"key":"meet","name":"会面","emoji":"🤝","color":"#35C29A","soft":"#E7F8F2","min":60},{"key":"partner","name":"伙伴会面","emoji":"👥","color":"#6C8CFF","soft":"#EDF1FF","min":60},{"key":"review","name":"复盘","emoji":"🔍","color":"#E86AA6","soft":"#FDEDF5","min":30},{"key":"audio","name":"读书音频","emoji":"🎧","color":"#E8A33D","soft":"#FFF6E8","min":30},{"key":"php","name":"回php","emoji":"💻","color":"#4FB6C4","soft":"#EAF7F9","min":30},{"key":"health","name":"聊健康","emoji":"🌿","color":"#9B7BD4","soft":"#F3EEFC","min":30}],"other":{"key":"other","name":"其他","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"}};</script>
 <script>
 window.CORE = (function () {
 'use strict';
@@ -777,6 +805,7 @@ const KINDS = [
   { key: 'review',  name: '复盘',     emoji: '🔍', color: '#E86AA6', soft: '#FDEDF5', min: 30 },
   { key: 'audio',   name: '读书音频', emoji: '🎧', color: '#E8A33D', soft: '#FFF6E8', min: 30 },
   { key: 'php',     name: '回php',    emoji: '💻', color: '#4FB6C4', soft: '#EAF7F9', min: 30 },
+  { key: 'health',  name: '聊健康',   emoji: '🌿', color: '#9B7BD4', soft: '#F3EEFC', min: 30 },
 ];
 const OTHER = { key: 'other', name: '其他', emoji: '·', color: '#B8B1A9', soft: '#F1EDE7' };
 const ALL_KINDS = [...KINDS, OTHER];
@@ -1337,6 +1366,8 @@ const handlers = {
     const blk = findBlock(db, mustId(b.id));
     if (b.title !== undefined) blk.title = mustText(b.title, '日程内容');
     if (b.kind !== undefined) blk.kind = normKind(b.kind);
+    // 只解/挂关联，不动这块本身 —— 待办把时间清掉时走这条
+    if (b.taskId !== undefined) blk.taskId = b.taskId ? String(b.taskId) : null;
     if (b.start !== undefined) blk.start = mustTime(b.start, '开始时间');
     if (b.end !== undefined) blk.end = mustTime(b.end, '结束时间');
     if (parseT(blk.end) <= parseT(blk.start)) throw bad('结束时间必须晚于开始时间');
@@ -1739,6 +1770,7 @@ let S = null;
 let PXH = 40;
 let pane = 'todo';
 let dragItem = null;
+let placedAt = new Map();   // 待办 id → "19:00"，今天排进时间轴的那一块
 let drag = null;
 let popBlock = null;
 let sheetCtx = null;
@@ -1873,6 +1905,24 @@ function layout() {
 
 const viewTop = dayStart => { const d = new Date(dayStart); d.setHours(VIEW_FROM, 0, 0, 0); return d; };
 const viewBottom = dayStart => { const d = new Date(dayStart); d.setHours(VIEW_TO, 0, 0, 0); return d; };
+
+/** "20:30" → 这一天的 20:30。小时数比 DAY_FROM 小的算次日凌晨 */
+function atClock(dayStart, hm) {
+  const [h, m] = String(hm).split(':').map(Number);
+  if (!Number.isFinite(h)) return null;
+  const d = new Date(dayStart);
+  d.setHours(h, Number.isFinite(m) ? m : 0, 0, 0);
+  if (h < DAY_FROM) d.setDate(d.getDate() + 1);
+  return d;
+}
+/** Date → "20:30" */
+const hmOf = d => `${p2(d.getHours())}:${p2(d.getMinutes())}`;
+/** 当前时刻往后取整到 5 分钟 */
+function nowRound5() {
+  const d = new Date();
+  d.setMinutes(Math.ceil(d.getMinutes() / 5) * 5, 0, 0);
+  return hmOf(d);
+}
 
 /**
  * 时间轴一屏铺 18:00–24:00，所以默认停在这一段的开头。
@@ -2582,6 +2632,12 @@ function renderTodo(box) {
   const open = S.tasks.filter(t => !t.done);
   const done = S.tasks.filter(t => t.done);
 
+  // 哪条待办今天已经排进时间轴了 —— 行上标个时间点
+  placedAt = new Map();
+  for (const e of S.events) {
+    if (e.taskId && !e.done && !placedAt.has(e.taskId)) placedAt.set(e.taskId, hmOf(parse(e.start)));
+  }
+
   for (const c of KINDS) {
     const list = open.filter(t => normK(t.kind) === c.key);
     if (!list.length) continue;
@@ -2633,6 +2689,7 @@ function todoRow(t, c, isDoneSection) {
     <span class="bar"></span>
     <span class="txt">${esc(t.title)}</span>
     ${t.todayActual ? `<span class="done-min num">已做${fmtDur(t.todayActual)}</span>` : ''}
+    ${placedAt.has(t.id) ? `<span class="at num">${placedAt.get(t.id)}</span>` : ''}
     ${t.estMin ? `<span class="est num">${fmtDur(t.estMin)}</span>` : ''}
     ${isDoneSection ? '' : `<button class="sched" title="排到时间轴">📅</button>`}
     ${isDoneSection ? '' : `<button class="play" title="${running ? '正在计时' : '开始计时'}">${running ? '■' : '▶'}</button>`}
@@ -2669,7 +2726,7 @@ function todoRow(t, c, isDoneSection) {
   el.querySelector('.txt').onclick = () => openSheet('task', t);
 
   if (!isDoneSection) {
-    el.draggable = true;
+    longPressDrag(el);
     el.addEventListener('dragstart', e => {
       dragItem = { src:'task', id:t.id, title:t.title, kind:normK(t.kind), estMin:t.estMin };
       el.classList.add('dragging');
@@ -2711,6 +2768,35 @@ function todoRow(t, c, isDoneSection) {
 
 const clearDropMarks = () => document.querySelectorAll('.drop-target').forEach(n => n.classList.remove('drop-target'));
 
+/**
+ * 长按才解锁拖动。
+ * 原来 draggable 一直是 true，鼠标一抖整行就被拖走了 —— 现在要按住 380ms，
+ * 中途移动超过 8px 就当普通点击，不算拖。
+ */
+function longPressDrag(el) {
+  let timer = null, sx = 0, sy = 0;
+  const arm = () => { timer = null; el.draggable = true; el.classList.add('arm'); };
+  const reset = () => {
+    clearTimeout(timer); timer = null;
+    el.draggable = false;
+    el.classList.remove('arm');
+  };
+  el.draggable = false;
+  el.addEventListener('pointerdown', e => {
+    if (e.button !== 0) return;
+    if (e.target.closest('button, input, .chk')) return;   // 按在按钮/勾选框上不算
+    sx = e.clientX; sy = e.clientY;
+    clearTimeout(timer);
+    timer = setTimeout(arm, 380);
+  });
+  el.addEventListener('pointermove', e => {
+    if (timer && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) reset();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(ev, reset);
+  el.addEventListener('dragend', reset);
+  return el;
+}
+
 function renderTray(box) {
   box.innerHTML = '';
   const chips = document.createElement('div');
@@ -2723,7 +2809,7 @@ function renderTray(box) {
     const el = document.createElement('div');
     el.className = 'chip' + (t.onToday ? ' on-day' : '');
     el.style.setProperty('--c', c.color);
-    el.draggable = true;
+    longPressDrag(el);
     el.innerHTML = `<span class="bar"></span><span class="nm">${esc(t.title)}</span>
       <span class="mm num">${fmtDur(t.minutes)}</span><button class="sched" title="排到时间轴">📅</button><button class="x" title="删掉">✕</button>`;
     el.title = t.onToday ? `${t.title}\n今天已经排过了` : `${t.title}\n拖进时间轴 = 排进今天`;
@@ -2956,10 +3042,18 @@ function cardByTask(d) {
 
 /* ================= 添加 / 编辑 面板 ================= */
 function openSheet(mode, task, presetKind, slot) {
-  sheetCtx = { mode, task: task || null, kind: task ? normK(task.kind) : (presetKind || 'talk'), slot: slot || null };
   const t = task;
   const isTray = mode === 'tray';
   const fresh = !t;          // 新加的才自动带标题和时长，改老的不动
+  // 这条待办今天已经排进时间轴的话，把那一块找出来 —— 开始时间要显示成它
+  const onAxis = (t && !isTray) ? S.events.find(e => e.taskId === t.id && !e.done) : null;
+  const startAt = slot || (onAxis ? parse(onAxis.start) : null);
+
+  sheetCtx = {
+    mode, task: t || null, blockId: onAxis ? onAxis.id : null,
+    kind: t ? normK(t.kind) : (presetKind || 'talk'),
+    slot: slot || null,
+  };
   let minVal = isTray ? 60 : DEFAULT_MIN;
   if (t) minVal = (isTray ? t.minutes : t.estMin) || minVal;
   $('sheet-in').innerHTML = `
@@ -2972,6 +3066,14 @@ function openSheet(mode, task, presetKind, slot) {
           style="--c:${c.color};--s:${c.soft}"><span class="e">${c.emoji}</span>${c.name}</button>`).join('')}
     </div>
     <div class="kindtip">点上面那排 = 连标题和时长一起填上</div>
+    ${isTray ? '' : `
+    <div class="startrow">
+      <span class="flabel">开始</span>
+      <div class="tinput"><input type="time" id="sh-start" step="300" value="${startAt ? hmOf(startAt) : ''}"></div>
+      ${S.isToday ? `<button class="qk" id="sh-start-now">现在</button>` : ''}
+      <button class="qk" id="sh-start-clear">先不排</button>
+    </div>
+    <div class="sh-hint" id="sh-start-hint"></div>`}
     <div class="footrow">
       <span class="flabel">${isTray ? '默认' : '预计'}</span>
       <div class="stepper">
@@ -2990,11 +3092,12 @@ function openSheet(mode, task, presetKind, slot) {
     const cur = Math.round((Number(el.value) || 0) / 15) * 15;
     el.value = Math.max(15, cur + d);
   };
-  $('sh-minus').onclick = () => bump(-15);
-  $('sh-plus').onclick = () => bump(15);
+  $('sh-minus').onclick = () => { bump(-15); if (sheetCtx.paintStart) sheetCtx.paintStart(); };
+  $('sh-plus').onclick = () => { bump(15); if (sheetCtx.paintStart) sheetCtx.paintStart(); };
   $('sh-min').addEventListener('change', () => {
     const el = $('sh-min');
     el.value = Math.max(15, Math.round((Number(el.value) || 0) / 15) * 15);
+    if (sheetCtx.paintStart) sheetCtx.paintStart();
   });
 
   $('sh-kinds').querySelectorAll('button').forEach(b => {
@@ -3007,8 +3110,36 @@ function openSheet(mode, task, presetKind, slot) {
       const title = $('sh-title');
       if (k && !title.value.trim()) title.value = k.name;
       if (k && k.min) $('sh-min').value = k.min;
+      if (sheetCtx.paintStart) sheetCtx.paintStart();
     };
   });
+  // 开始时间：留空 = 只进待办；填了 = 顺手排进时间轴
+  const stIn = $('sh-start');
+  if (stIn) {
+    const hint = $('sh-start-hint');
+    const paint = () => {
+      const v = stIn.value;
+      const min = Number($('sh-min').value) || DEFAULT_MIN;
+      if (!v) {
+        hint.innerHTML = '不填 = 只放进待办，之后再拖到时间轴';
+        return;
+      }
+      const s = atClock(parse(S.dayStart), v);
+      const e = new Date(s.getTime() + min * 60000);
+      const clash = S.events.filter(x => !x.done && (!onAxis || x.id !== onAxis.id)
+        && parse(x.start) < e && parse(x.end) > s);
+      hint.innerHTML = `排进时间轴 <b>${hmOf(s)}–${hmOf(e)}</b>`
+        + (clash.length ? `　·　和「${esc(clash[0].title)}」撞上了` : '');
+    };
+    sheetCtx.paintStart = paint;
+    stIn.addEventListener('input', paint);
+    stIn.addEventListener('change', paint);
+    const nowBtn = $('sh-start-now');
+    if (nowBtn) nowBtn.onclick = () => { stIn.value = nowRound5(); paint(); };
+    $('sh-start-clear').onclick = () => { stIn.value = ''; paint(); };
+    paint();
+  }
+
   $('sh-save').onclick = saveSheet;
   $('sh-title').addEventListener('keydown', e => { if (e.key === 'Enter') saveSheet(); });
   setTimeout(() => $('sh-title').focus(), 40);
@@ -3018,28 +3149,43 @@ async function saveSheet() {
   const title = $('sh-title').value.trim();
   if (!title) { $('sh-title').focus(); return; }
   const min = Number($('sh-min').value) || DEFAULT_MIN;
-  const { mode, task, kind, slot } = sheetCtx;
+  const { mode, task, kind, slot, blockId } = sheetCtx;
+  let scheduled = false;
   if (mode === 'tray') {
     if (task) await call('/api/tray/update', { id: task.id, title, kind, minutes: min });
     else await call('/api/tray/add', { title, kind, minutes: min });
   } else {
+    // 开始时间：双击时间轴进来的用点中的那个点；否则读输入框
+    const sv = $('sh-start') ? $('sh-start').value : '';
+    const startAt = slot || (sv ? atClock(parse(S.dayStart), sv) : null);
+    scheduled = !!startAt;
+
     let taskId = task ? task.id : null;
     if (task) await call('/api/task/update', { id: task.id, title, kind, estMin: min });
     else {
       const r = await call('/api/task/add', { title, kind, estMin: min });
       taskId = r.id || null;
     }
-    // 从时间轴空白处双击进来的，顺手把日程也排上
-    if (slot) {
-      await call('/api/block/add', {
-        title, kind, taskId,
-        start: T(slot), minutes: min,
-      });
+
+    if (startAt) {
+      const end = T(new Date(startAt.getTime() + min * 60000));
+      if (blockId) {
+        // 这条已经排在时间轴上了，改时间/时长就行，别再加一块
+        await call('/api/block/update', { id: blockId, title, kind, start: T(startAt), end });
+      } else {
+        await call('/api/block/add', { title, kind, taskId, start: T(startAt), minutes: min });
+      }
+    } else if (blockId) {
+      // 时间清空了 = 从时间轴撤下来。做过的那块留着只解开关联，免得把实际时长一起删了
+      const blk = S.events.find(e => e.id === blockId);
+      if (blk && (blk.actualMin > 0 || blk.done)) await call('/api/block/update', { id: blockId, taskId: null });
+      else await call('/api/block/delete', { id: blockId, title });
     }
   }
+  const msg = task ? '已保存' : (scheduled ? '加上了，也排进时间轴了' : '加上了');
   closeSheet();
   await load();
-  toast(task ? '已保存' : slot ? '已排进今天' : '加上了');
+  toast(msg);
 }
 
 function closeSheet() { $('sheet').classList.remove('on'); sheetCtx = null; }
