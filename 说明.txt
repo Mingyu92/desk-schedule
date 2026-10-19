@@ -1,0 +1,35 @@
+日程 · 手机版
+================
+
+这个文件夹里的东西是 tools/build-mobile.js 生成的，别手改 ——
+改 app.html 或 core.js，然后重跑：  node tools\build-mobile.js
+
+里面有什么
+----------
+  index.html              主程序（单文件，含界面 + 内核 + 本地存储）
+  pomodoro.html           番茄钟（第三方 sidsurakanti/pomodoro-timer，MIT）
+  pomodoro-settings.html  番茄钟的设置页
+  manifest.webmanifest    加到主屏幕要用的
+  sw.js                   离线缓存
+  icon-192.png / 512      图标
+
+怎么装到手机
+------------
+1. 把这个文件夹整个传到网上（比如 GitHub Pages），或者放到任意一个
+   https 的静态站上。必须走 https，否则"添加到主屏幕"和离线缓存都不生效。
+2. 手机 Chrome 打开那个网址
+3. 右上角菜单 → 添加到主屏幕
+4. 桌面就多一个图标，点开是全屏的
+
+数据在哪
+--------
+只在这台手机的浏览器里（localStorage 的 desk.schedule.v1）。
+不上传、不联网、电脑上那份跟它互不影响。
+换手机或清浏览器数据会丢 —— 统计页最下面有「导出备份」，隔段时间点一次。
+
+跟电脑版的关系
+--------------
+同一套界面代码、同一个内核（core.js）。
+电脑版数据在 data\store.json，手机版在浏览器本地，两边各记各的。
+
+本次构建：2026/10/19 17:06:50

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="logo" type="image/png" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMjciIHZpZXdCb3g9IjAgMCAxOCAyNyIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTAuMTcwNDU1IDI3VjAuODE4MTgxSDkuMDE3MDVDMTEuMDcxIDAuODE4MTgxIDEyLjc1IDEuMTg4OTIgMTQuMDU0IDEuOTMwNEMxNS4zNjY1IDIuNjYzMzUgMTYuMzM4MSAzLjY1NjI1IDE2Ljk2ODggNC45MDkwOUMxNy41OTk0IDYuMTYxOTMgMTcuOTE0OCA3LjU1OTY2IDE3LjkxNDggOS4xMDIyN0MxNy45MTQ4IDEwLjY0NDkgMTcuNTk5NCAxMi4wNDY5IDE2Ljk2ODggMTMuMzA4MkMxNi4zNDY2IDE0LjU2OTYgMTUuMzgzNSAxNS41NzUzIDE0LjA3OTUgMTYuMzI1M0MxMi43NzU2IDE3LjA2NjggMTEuMTA1MSAxNy40Mzc1IDkuMDY4MTggMTcuNDM3NUgyLjcyNzI3VjE0LjYyNUg4Ljk2NTkxQzEwLjM3MjIgMTQuNjI1IDExLjUwMTQgMTQuMzgyMSAxMi4zNTM3IDEzLjg5NjNDMTMuMjA2IDEzLjQxMDUgMTMuODIzOSAxMi43NTQzIDE0LjIwNzQgMTEuOTI3NkMxNC41OTk0IDExLjA5MjMgMTQuNzk1NSAxMC4xNTA2IDE0Ljc5NTUgOS4xMDIyN0MxNC43OTU1IDguMDUzOTggMTQuNTk5NCA3LjExNjQ4IDE0LjIwNzQgNi4yODk3N0MxMy44MjM5IDUuNDYzMDcgMTMuMjAxNyA0LjgxNTM0IDEyLjM0MDkgNC4zNDY1OUMxMS40ODAxIDMuODY5MzIgMTAuMzM4MSAzLjYzMDY4IDguOTE0NzcgMy42MzA2OEgzLjM0MDkxVjI3SDAuMTcwNDU1WiIgZmlsbD0iIzRBQ0JFOSIvPgo8L3N2Zz4K">
+		<title>Pomodoro - Settings</title>
+		<style>
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");@import url("https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&display=swap");@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");.about-container{font-family:"Poppins", sans-serif;color:#dadada;width:85%;height:90vh;margin:0 auto;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:22px;padding:3rem 0rem;letter-spacing:.9px}.about-container #subtitle{font-family:"Poppins",sans-serif;font-weight:500;color:#62d6fa;font-size:50px}.about-container .about-content{width:50%;text-align:center}.about-container .about-content a{text-decoration:none;color:#abc2f3}#start-btn:disabled,#resume-btn:disabled{display:none}.settings-container{height:90vh;display:flex;flex-direction:column;justify-content:center;align-items:center;font-family:"Poppins",sans-serif}.header{margin:20px;font-size:55px;color:#46cfee;font-weight:500}.subtitle{text-align:center;font-size:22.5px;color:#bdbdbd}.opt-btn{font-family:"Poppins",sans-serif;font-size:15px;background-color:#e2e2e2;cursor:pointer;border-radius:10px;border:none;outline:none;width:115px;height:32.5px;margin:1rem 0.75rem 1.75rem 0;transition:150ms all ease}button.active-pl,button.active-sl,button.active-lb{background-color:#6dcbe0;font-weight:500}*,*::after,*::before{padding:0;margin:0;box-sizing:border-box}body{background-color:#2b2d33}header{width:85%;height:10vh;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding-top:2rem;font-family:"Poppins",sans-serif;color:#90e1f3}header #logo{font-size:42.5px;font-weight:500}header #logo a{text-decoration:none;color:#90e1f3}header ul li{list-style:none;font-size:22.5px;font-weight:500}header button{cursor:pointer;border:none;font:inherit;color:inherit;background:transparent}.nav-list{display:flex;padding-top:5px}.nav-list .nav-item{padding:1.5rem}.center{margin:0 auto;width:85%;height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:center}.center .display{display:block;height:190px;font-family:"Poppins",sans-serif;font-size:140px;color:#4acbe9}.center .btn{display:inline;cursor:pointer;background-color:transparent;border:none;outline:none;padding:1rem;transition:200ms all ease}.center .btn svg{transition:250ms all ease;width:115px}.center .btn svg path#Rectangle-1{fill:#c0effa}.center .btn:hover svg{width:127.5px}.center .btn:hover svg path#Rectangle-1{fill:#4fd5f5}.bottom{width:100%;height:10%;display:flex;justify-content:center}.bottom svg{width:40px}.nav-btn{padding:0.5rem;cursor:pointer;outline:none;transition:200ms all linear;color:#919191}.nav-btn:hover{color:#90e1f3 !important}.nav-link{color:#919191;text-decoration:none;transition:200ms all ease}.nav-link:hover{color:#90e1f3 !important}@media screen and (max-width: 767px){header #logo{font-size:30px;padding-right:10px}header ul li{font-size:1.1px}.nav-list .nav-item{padding:5px}.display{font-size:120px !important;height:150px !important}.btn:hover svg{width:100px !important}.btn:hover svg path#Rectangle-1{fill:#c0effa !important}svg{width:100px !important}.about-container{font-size:17.5px !important}.about-container .about-content{width:90%}.subtitle{font-size:20px !important}.opt-btn{width:90px !important;height:27.5px !important;font-size:12px !important}}@media screen and (max-width: 667px){header #logo{font-size:30px;padding-right:3px}header ul li{font-size:1.1rem}.nav-list .nav-item{padding:5px}.display{font-size:110px !important;height:140px !important}.btn:hover svg{width:90px !important}.btn:hover svg path#Rectangle-1{fill:#c0effa !important}svg{width:90px !important}.about-container{font-size:17.5px !important}.about-container .about-content{width:90%}.subtitle{font-size:20px !important}.opt-btn{width:90px !important;height:27.5px !important;font-size:12px !important}}
+
+</style>
+	</head>
+	<body>
+		<header class="nav-bar" id="main-nav-bar">
+			<h1 id="logo"><a href="pomodoro.html">pomodoro</a></h1>
+
+			<ul class="nav-list">
+				<li class="nav-item" id="about">
+					<button id="about-btn" class="nav-btn">
+						<a href="#" id="about-link" class="nav-link">
+							about
+						</a>
+					</button>
+				</li>
+
+				<li class="nav-item" id="settings">
+					<button id="settings-btn" class="nav-btn">
+						<a href="#" id="settings-link" class="nav-link">settings</a>
+					</button>
+				</li>
+			</ul>
+		</header>
+
+		<section class="settings-container">
+			<div class="body">
+				<div class="pomodoro-length options">
+					<p class="subtitle">pomodoro timer</p>
+					<button class="opt-btn active-pl" id="pl-25">25</button>
+					<button class="opt-btn" id="pl-15">15</button>
+					<button class="opt-btn" id="pl-10">10</button>
+				</div>
+
+				<div class="small-break-length options">
+					<p class="subtitle">small break timer</p>
+					<button class="opt-btn active-sl" id="sl-5">5</button>
+					<button class="opt-btn" id="sl-10">10</button>
+					<button class="opt-btn" id="sl-15">15</button>
+				</div>
+
+				<div class="long-break-length options">
+					<p class="subtitle">long break timer</p>
+					<button class="opt-btn active-lb" id="lb-15">15</button>
+					<button class="opt-btn" id="lb-20">20</button>
+					<button class="opt-btn" id="lb-30">30</button>
+				</div>
+			</div>
+		</section>
+
+		
+		
+	<script>
+// options
+const pl25 = document.querySelector("#pl-25")
+const pl15 = document.querySelector("#pl-15")
+const pl10 = document.querySelector("#pl-10")
+
+const sl5 = document.querySelector("#sl-5")
+const sl10 = document.querySelector("#sl-10")
+const sl15 = document.querySelector("#sl-15")
+
+const lb15 = document.querySelector("#lb-15")
+const lb20 = document.querySelector("#lb-20")
+const lb30 = document.querySelector("#lb-30")
+
+sl5.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-sl");
+	for (const e of items) e.classList.remove("active-sl");
+	sl5.classList.add("active-sl");
+	if (window.localStorage) {
+		localStorage.setItem("sbTime", "5:00");
+		localStorage.setItem("sbItem", "#sl-5");
+	}
+})
+
+sl10.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-sl");
+	for (const e of items) e.classList.remove("active-sl");
+	sl10.classList.add("active-sl");
+	if (window.localStorage) {
+		localStorage.setItem("sbTime", "10:00");
+		localStorage.setItem("sbItem", "#sl-10");
+	}
+})
+
+sl15.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-sl");
+	for (const e of items) e.classList.remove("active-sl");
+	sl15.classList.add("active-sl");
+	if (window.localStorage) {
+		localStorage.setItem("sbTime", "15:00");
+		localStorage.setItem("sbItem", "#sl-15");
+	}
+})
+
+pl25.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-pl")
+	for (const e of items) e.classList.remove("active-pl")
+	pl25.classList.add("active-pl")
+	if (window.localStorage) {
+		localStorage.setItem("plTime", "25:00")
+		localStorage.setItem("plItem", "#pl-25")
+	}
+})
+
+
+pl15.addEventListener("click", () => {
+	let items = document.querySelectorAll(".active-pl")
+	for (const e of items) e.classList.remove("active-pl")
+	pl15.classList.add("active-pl")
+	if (window.localStorage) {
+		localStorage.setItem("plTime", "15:00")
+		localStorage.setItem("plItem", "#pl-15")
+	}
+})
+
+
+pl10.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-pl") || null
+	for (const e of items) e.classList.remove("active-pl")
+	pl10.classList.add("active-pl")
+	if (window.localStorage) {
+		localStorage.setItem("plTime", "10:00")
+		localStorage.setItem("plItem", "#pl-10")
+	}
+})
+
+lb15.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-lb")
+	for (const e of items) e.classList.remove("active-lb")
+	lb15.classList.add("active-lb")
+	if (window.localStorage) {
+		localStorage.setItem("lbTime", "15:00")
+		localStorage.setItem("lbItem", "#lb-15")
+	}
+})
+
+
+lb20.addEventListener("click", () => {
+	let items = document.querySelectorAll(".active-lb")
+	for (const e of items) e.classList.remove("active-lb")
+	lb20.classList.add("active-lb")
+	if (window.localStorage) {
+		localStorage.setItem("lbTime", "20:00")
+		localStorage.setItem("lbItem", "#lb-20")
+	}
+})
+
+lb30.addEventListener("click", () => {
+	items = document.querySelectorAll(".active-lb") || null
+	for (const e of items) e.classList.remove("active-lb")
+	lb30.classList.add("active-lb")
+	if (window.localStorage) {
+		localStorage.setItem("lbTime", "30:00")
+		localStorage.setItem("lbItem", "#lb-30")
+	}
+})
+
+</script>
+<script>
+let timerDisplay = document.querySelector("#display");
+let pomodoroTime, timeObj;
+let smallBreakTime, smallBreakObj;
+let longBreakTime, longBreakObj;
+
+if (window.localStorage && localStorage.plTime && localStorage.plItem) {
+	pomodoroTime = localStorage.getItem("plTime");
+	timeObj = localStorage.getItem("plItem");
+}
+
+if (window.localStorage && localStorage.sbTime && localStorage.sbItem) {
+	[smallBreakTime, smallBreakObj] = [
+		localStorage.getItem("sbTime"),
+		localStorage.getItem("sbItem"),
+	];
+} else {
+	localStorage.setItem("sbTime", "5:00");
+	localStorage.setItem("sbItem", "#sb-5");
+}
+
+if (window.localStorage && localStorage.lbTime && localStorage.lbItem) {
+	[longBreakTime, longBreakObj] = [
+		localStorage.getItem("lbTime"),
+		localStorage.getItem("lbItem"),
+	];
+} else {
+	localStorage.setItem("lbTime", "15:00");
+	localStorage.setItem("lbItem", "#ll-15");
+}
+if (timerDisplay) {
+	if (pomodoroTime) timerDisplay.innerHTML = pomodoroTime;
+	else {
+		timerDisplay.innerHTML = "25:00";
+		if (window.localStorage) localStorage.setItem("plTime", "25:00");
+	}
+}
+
+if (timeObj) {
+	const activeObj = document.querySelector(timeObj);
+	if (activeObj) {
+		const items = document.querySelectorAll(".active-pl");
+		for (const e of items) e.classList.remove("active-pl");
+		activeObj.classList.add("active-pl");
+	}
+}
+
+if (smallBreakObj) {
+	const activeObj = document.querySelector(smallBreakObj);
+	if (activeObj) {
+		const items = document.querySelectorAll(".active-sl");
+		for (const e of items) e.classList.remove("active-sl");
+		activeObj.classList.add("active-sl");
+	}
+}
+
+if (longBreakObj) {
+	const activeObj = document.querySelector(longBreakObj);
+	if (activeObj) {
+		const items = document.querySelectorAll(".active-lb");
+		for (const e of items) e.classList.remove("active-lb");
+		activeObj.classList.add("active-lb");
+	}
+}
+
+</script>
+</body>
+</html>
