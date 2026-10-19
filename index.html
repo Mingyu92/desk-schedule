@@ -405,6 +405,59 @@
            display:flex; align-items:baseline; gap:8px; margin-bottom:12px;}
   .card h3 span{margin-left:auto; font-weight:400; font-size:11px; color:var(--ink3);}
 
+  /* ---- 计划 vs 实际 ---- */
+  .vs-top{display:flex; align-items:flex-end; gap:18px; margin-bottom:13px;}
+  .vs-num{display:flex; flex-direction:column; gap:1px;}
+  .vs-num b{font-size:21px; line-height:1.1; color:var(--ink); font-variant-numeric:tabular-nums;}
+  .vs-num.a b{color:#21896A;}
+  .vs-num span{font-size:10.5px; color:var(--ink3);}
+  .vs-delta{margin-left:auto; text-align:right; font-size:10.5px; color:var(--ink3); line-height:1.5;}
+  .vs-delta b{font-size:16px; font-variant-numeric:tabular-nums;}
+  .vs-delta b.up{color:#B4462C;}
+  .vs-delta b.down{color:#1F7D62;}
+  .vs-line{display:flex; align-items:center; gap:8px; font-size:11px; color:var(--ink3); margin-top:5px;}
+  .vs-line .lb{width:24px; flex:none;}
+  .vs-line .tr{flex:1; height:9px; border-radius:5px; background:#F3EEE7; overflow:hidden;}
+  .vs-line .tr i{display:block; height:100%; border-radius:5px;
+                 transition:width .4s var(--bounce);}
+  .vs-line .vl{width:54px; text-align:right; flex:none; color:var(--ink2);
+               font-variant-numeric:tabular-nums;}
+
+  .vs-row{padding:9px 0; border-top:1px solid #F3EEE7;}
+  .vs-row:first-of-type{border-top:0; padding-top:0;}
+  .vs-row .hd{display:flex; align-items:center; gap:6px; font-size:12px; margin-bottom:5px;}
+  .vs-row .hd .em{width:15px; text-align:center; flex:none;}
+  .vs-row .hd .nm{color:var(--ink2);}
+  .vs-row .hd .ct{font-size:10px; color:#C4B8A8;}
+  .vs-row .hd .df{margin-left:auto; font-size:10.5px; padding:1px 7px; border-radius:7px;
+                  font-variant-numeric:tabular-nums;}
+  .df.good{background:#E7F8F2; color:#1F7D62;}
+  .df.bad{background:#FFF0E8; color:#B4462C;}
+  .df.flat{background:#F3EEE7; color:#8B8479;}
+
+  .vs-tally{display:flex; gap:8px; margin-top:2px;}
+  .vs-tally div{flex:1; text-align:center; padding:9px 4px; border-radius:11px; background:#FAF6F0;}
+  .vs-tally b{display:block; font-size:17px; line-height:1.2; font-variant-numeric:tabular-nums;}
+  .vs-tally span{font-size:10px; color:var(--ink3);}
+  .vs-tally .over b{color:#B4462C;}
+  .vs-tally .under b{color:#C77A18;}
+  .vs-tally .ok b{color:#1F7D62;}
+
+  .vs-item{display:flex; align-items:center; gap:8px; padding:6px 0; font-size:11.5px;
+           border-top:1px solid #F6F1EA;}
+  .vs-item:first-of-type{border-top:0;}
+  .vs-item .em{width:15px; text-align:center; flex:none;}
+  .vs-item .tt{flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+               color:var(--ink2);}
+  .vs-item .dd{font-size:10px; color:#C4B8A8; flex:none;}
+  .vs-item .pa{flex:none; font-size:10.5px; color:var(--ink3); font-variant-numeric:tabular-nums;}
+  .vs-item .df{flex:none; min-width:52px; text-align:right; font-size:10.5px; padding:1px 7px;
+               border-radius:7px; font-variant-numeric:tabular-nums;}
+
+  .vdays{display:flex; justify-content:space-between; align-items:flex-end; gap:2px;}
+  .vdays .vday{border-radius:9px; padding:2px 0 0; transition:background .15s;}
+  .vdays .vday:hover{background:#FAF6F0;}
+
   .stack{display:flex; height:12px; border-radius:7px; overflow:hidden;
          background:#F2EADE; margin-bottom:14px;}
 
@@ -755,7 +808,7 @@ body.side-collapsed .side-open-btn{ display:none; }
 </style>
 </head>
 <body>
-<script>window.BOOT = {"kinds":[{"key":"talk","name":"对话","emoji":"💬","color":"#FF8A5B","soft":"#FFF0E8","min":30},{"key":"meet","name":"会面","emoji":"🤝","color":"#35C29A","soft":"#E7F8F2","min":60},{"key":"partner","name":"伙伴会面","emoji":"👥","color":"#6C8CFF","soft":"#EDF1FF","min":60},{"key":"review","name":"复盘","emoji":"🔍","color":"#E86AA6","soft":"#FDEDF5","min":30},{"key":"audio","name":"读书音频","emoji":"🎧","color":"#E8A33D","soft":"#FFF6E8","min":30},{"key":"php","name":"回php","emoji":"💻","color":"#4FB6C4","soft":"#EAF7F9","min":30},{"key":"health","name":"聊健康","emoji":"🌿","color":"#9B7BD4","soft":"#F3EEFC","min":30}],"other":{"key":"other","name":"其他","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"}};</script>
+<script>window.BOOT = {"kinds":[{"key":"talk","name":"对话","emoji":"💬","color":"#FF8A5B","soft":"#FFF0E8","min":30},{"key":"meet","name":"会面","emoji":"🤝","color":"#35C29A","soft":"#E7F8F2","min":60},{"key":"partner","name":"伙伴会面","emoji":"👥","color":"#6C8CFF","soft":"#EDF1FF","min":60},{"key":"review","name":"复盘","emoji":"🔍","color":"#E86AA6","soft":"#FDEDF5","min":30},{"key":"audio","name":"读书音频","emoji":"🎧","color":"#E8A33D","soft":"#FFF6E8","min":30},{"key":"php","name":"回php","emoji":"💻","color":"#4FB6C4","soft":"#EAF7F9","min":30},{"key":"health","name":"聊健康","emoji":"🌿","color":"#9B7BD4","soft":"#F3EEFC","min":30}],"other":{"key":"other","name":"其他","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"},"dayFrom":7};</script>
 <script>
 window.CORE = (function () {
 'use strict';
@@ -852,8 +905,8 @@ function parseT(s) {
 const atHour = (base, h) => { const d = new Date(base); d.setHours(h, 0, 0, 0); return d; };
 const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
 
-const DAY_START_HOUR = 9;   // 起床
-const DAY_END_HOUR = 2;     // 次日睡觉
+const DAY_START_HOUR = 7;   // 一天从早上 7 点算起（2026-10-19 从 9 点提前过来的）
+const DAY_END_HOUR = 2;     // 到次日凌晨 2 点
 
 /** 凌晨 02:00 前打开界面，算前一天 */
 function anchorOf(now) {
@@ -1059,6 +1112,66 @@ function planStats(db, from, to) {
   };
 }
 
+/**
+ * 计划 vs 实际 —— 专门给「对比」那一页用。
+ * 逐条算偏差，再按子类别和整体汇总。
+ * 只对「真的计过时」的块算准不准：没计过时的块，实际是 0，
+ * 拿来比会全被算成「排多了」，那是噪音不是信息。
+ */
+function vsStats(db, from, to) {
+  const bs = blocksIn(db, from, to);
+  const now = new Date();
+
+  const rows = [];
+  for (const b of bs) {
+    const plan = Math.round(minutesOf(b));
+    if (plan <= 0) continue;
+    const actual = Math.round(actualMinutesOf(b, now));
+    rows.push({
+      id: b.id, title: b.title, kind: normKind(b.kind), start: b.start,
+      plan, actual, diff: actual - plan, done: !!b.done, timed: actual > 0,
+    });
+  }
+
+  const planned = rows.reduce((s, r) => s + r.plan, 0);
+  const actual = rows.reduce((s, r) => s + r.actual, 0);
+  const timed = rows.filter(r => r.timed);
+  const OVER = 10;   // 差 10 分钟以内算「正好」，免得全在抖
+
+  // 排多了 = 计划比实际多；超时了 = 实际比计划多
+  const over = timed.filter(r => r.diff <= -OVER);
+  const under = timed.filter(r => r.diff >= OVER);
+  const onTime = timed.length - over.length - under.length;
+  const avgAbs = timed.length
+    ? Math.round(timed.reduce((s, r) => s + Math.abs(r.diff), 0) / timed.length) : 0;
+
+  const byKind = ALL_KINDS.map(c => {
+    const list = rows.filter(r => r.kind === c.key);
+    if (!list.length) return null;
+    const p = list.reduce((s, r) => s + r.plan, 0);
+    const a = list.reduce((s, r) => s + r.actual, 0);
+    return {
+      key: c.key, name: c.name, emoji: c.emoji, color: c.color, soft: c.soft,
+      plan: p, actual: a, diff: a - p, count: list.length,
+      timed: list.filter(r => r.timed).length,
+      pct: p > 0 ? Math.round(a / p * 100) : 0,
+    };
+  }).filter(Boolean).sort((x, y) => y.plan - x.plan);
+
+  return {
+    planned, actual, diff: actual - planned,
+    pct: planned > 0 ? Math.round(actual / planned * 100) : 0,
+    count: rows.length, timedCount: timed.length,
+    doneCount: rows.filter(r => r.done).length,
+    over: { n: over.length, min: Math.round(-over.reduce((s, r) => s + r.diff, 0)) },
+    under: { n: under.length, min: Math.round(under.reduce((s, r) => s + r.diff, 0)) },
+    onTime: onTime, avgAbs,
+    byKind,
+    // 偏差最大的排前面 —— 这一页就是来看「哪儿排得不准」的
+    worst: [...timed].sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff)).slice(0, 30),
+  };
+}
+
 function rangeOf(range, dayStr = null) {
   const { anchor, dayStart, dayEnd } = frame(new Date(), dayStr);
   const today = dayKey(anchorOf(new Date())) === dayKey(anchor);
@@ -1090,6 +1203,7 @@ function buildStats(db, range = 'today', dayStr = null) {
     byTask: byTaskStats(bs).slice(0, 12),
     trend: trendStats(db, 8),
     plan: planStats(db, from, to),
+    vs: vsStats(db, from, to),
   };
 }
 
@@ -1615,6 +1729,7 @@ return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, 
     <div class="grow"></div>
     <div class="ring" id="ring" title="今天排满度"></div>
     <div class="clock num" id="clock">--:--</div>
+    <button class="ibtn" id="vs-btn" title="计划 vs 实际">⚖️</button>
     <button class="ibtn" id="stats-btn" title="看数据">📊</button>
     <button class="ibtn plus" id="add-btn" title="加待办 (N)">＋</button>
     <button class="ibtn" id="refresh" title="刷新">↻</button>
@@ -1677,6 +1792,18 @@ return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, 
       </div>
     </div>
     <div class="ov-body" id="ov-body"></div>
+  </div>
+
+  <div class="ov" id="vs">
+    <div class="ov-head">
+      <button class="back" id="vs-back">← 回来</button>
+      <div class="seg" id="vs-seg">
+        <button data-r="today" class="on">今天</button>
+        <button data-r="week">本周</button>
+        <button data-r="month">本月</button>
+      </div>
+    </div>
+    <div class="ov-body" id="vs-body"></div>
   </div>
 
 
@@ -1868,6 +1995,7 @@ async function load() {
 function applyHash() {
   const h = location.hash.replace('#', '');
   if (h === 'stats') return openStats();
+  if (h === 'vs') return openVs();
   if (['todo','tray','idea'].includes(h)) {
     $('side-tabs').querySelectorAll('.stab').forEach(x =>
       x.classList.toggle('on', x.dataset.pane === h));
@@ -1879,7 +2007,8 @@ function applyHash() {
 /* ================= 布局 ================= */
 // 一屏默认铺 18:00 → 24:00（她晚上做生意的时段），白天的往上滑就行
 const VIEW_FROM = 18, VIEW_TO = 24;
-const DAY_FROM = 9;          // 一天从 09:00 起床开始（算截止点用得上）
+// 一天从几点算起 —— 由服务端给（core.js 的 DAY_START_HOUR），别在这儿另写一份
+const DAY_FROM = (window.BOOT && window.BOOT.dayFrom) || 7;
 function layout() {
   const h = $('tl-scroll').clientHeight - 10;
   const hours = (parse(S.dayEnd) - parse(S.dayStart)) / 3600000;
@@ -2302,7 +2431,7 @@ document.addEventListener('pointerdown', e => {
   closePop();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closePop(); closeSheet(); closeHurry(); closeCuts(); }
+  if (e.key === 'Escape') { closePop(); closeSheet(); closeHurry(); closeCuts(); closeStats(); closeVs(); }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); doUndo(); }
   const tag = (document.activeElement || {}).tagName;
   if (e.key === 'n' && !e.ctrlKey && !e.metaKey && tag !== 'INPUT' && tag !== 'TEXTAREA') {
@@ -2319,7 +2448,7 @@ function render() {
   renderTimeline();
   renderSide();
   if (render._day !== S.anchor) { render._day = S.anchor; scrollToView(); }
-  if ($('ov').classList.contains('on')) renderStats();
+  if ($('ov').classList.contains('on') || $('vs').classList.contains('on')) renderStats();
 }
 
 function renderBar() {
@@ -2790,10 +2919,144 @@ async function refreshStats() {
 }
 
 function renderStats() {
+  if ($('ov').classList.contains('on')) renderStatCards();
+  if ($('vs').classList.contains('on')) renderVsCards();
+}
+
+function renderStatCards() {
   const box = $('ov-body');
   if (statsLoading || !statsData) { box.innerHTML = '<div class="card">读取中…</div>'; return; }
   const d = statsData;
   box.innerHTML = [cardByCat(d), cardPlan(d), cardTrend(d), cardByTask(d)].join('');
+}
+
+/* ================= 计划 vs 实际 =================
+   单独一页，专门看「排的」和「做的」差多少。
+   数据是 core.js 的 vsStats，跟统计页共用同一份 /api/stats 返回。
+------------------------------------------------- */
+function openVs() {
+  $('vs').classList.add('on');
+  statsRange = 'today';
+  $('vs-seg').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.r === 'today'));
+  statsData = S.stats;
+  renderStats();
+  refreshStats();
+}
+const closeVs = () => $('vs').classList.remove('on');
+
+const dfCls = n => Math.abs(n) < 10 ? 'flat' : (n > 0 ? 'bad' : 'good');
+const dfTxt = n => (n === 0 ? '±0' : (n > 0 ? '+' : '−') + fmtDur(Math.abs(n)));
+
+/** 一条「计划/实际」双条，共用同一个刻度 */
+function vsLine(label, val, max, color) {
+  return `<div class="vs-line"><span class="lb">${label}</span>
+    <span class="tr"><i style="width:${max > 0 ? Math.max(val > 0 ? 1.5 : 0, val / max * 100) : 0}%;background:${color}"></i></span>
+    <span class="vl">${val > 0 ? fmtDur(val) : '—'}</span></div>`;
+}
+
+function renderVsCards() {
+  const box = $('vs-body');
+  if (statsLoading || !statsData || !statsData.vs) { box.innerHTML = '<div class="card">读取中…</div>'; return; }
+  const d = statsData, v = d.vs;
+
+  if (!v.count) {
+    box.innerHTML = `<div class="card"><h3>计划 vs 实际<span>${d.label}</span></h3>
+      <div class="empty-note">这段时间还没有排任何日程，没什么可比的</div></div>`;
+    return;
+  }
+
+  /* ---- 1. 总览 ---- */
+  const max = Math.max(v.planned, v.actual, 1);
+  const dtxt = v.diff === 0 ? '一样多'
+    : (v.diff > 0 ? `实际比计划多 ${fmtDur(v.diff)}` : `实际比计划少 ${fmtDur(-v.diff)}`);
+  const card1 = `<div class="card">
+    <h3>计划 vs 实际<span>${d.label} · ${v.count} 件事</span></h3>
+    <div class="vs-top">
+      <div class="vs-num"><b>${fmtDur(v.planned)}</b><span>计划</span></div>
+      <div class="vs-num a"><b>${fmtDur(v.actual)}</b><span>实际</span></div>
+      <div class="vs-delta">
+        <b class="${v.diff > 0 ? 'up' : v.diff < 0 ? 'down' : ''}">${v.diff === 0 ? '±0' : (v.diff > 0 ? '+' : '−') + fmtDur(Math.abs(v.diff))}</b>
+        <div>${dtxt}</div>
+      </div>
+    </div>
+    ${vsLine('计划', v.planned, max, '#F0A879')}
+    ${vsLine('实际', v.actual, max, '#35C29A')}
+    <div class="vs-tally" style="margin-top:13px">
+      <div class="ok"><b>${v.pct}%</b><span>做/排</span></div>
+      <div class="ok"><b>${v.timedCount}/${v.count}</b><span>计过时的</span></div>
+      <div class="ok"><b>${v.doneCount}</b><span>标了完成</span></div>
+    </div>
+  </div>`;
+
+  /* ---- 2. 按子类别 ---- */
+  const kindRows = v.byKind.map(k => {
+    const m = Math.max(k.plan, k.actual, 1);
+    return `<div class="vs-row">
+      <div class="hd"><span class="em">${k.emoji}</span><span class="nm">${k.name}</span>
+        <span class="ct">${k.timed}/${k.count} 计过时</span>
+        <span class="df ${dfCls(k.diff)}">${k.timed ? dfTxt(k.diff) : '没计时'}</span></div>
+      ${vsLine('计划', k.plan, m, k.color)}
+      ${vsLine('实际', k.actual, m, '#35C29A')}
+    </div>`;
+  }).join('');
+  const card2 = `<div class="card">
+    <h3>按子类别比<span>计划 / 实际</span></h3>${kindRows}</div>`;
+
+  /* ---- 3. 近 7 天 ---- */
+  const days = d.plan.days;
+  const dmax = Math.max(...days.map(x => Math.max(x.planned, x.actual)), 60);
+  const H = 92, BASE = H - 14, TOP = 6;
+  const bars = days.map(x => {
+    const hp = Math.max(Math.round(x.planned / dmax * (BASE - TOP)), x.planned > 0 ? 2 : 0);
+    const ha = Math.max(Math.round(x.actual / dmax * (BASE - TOP)), x.actual > 0 ? 2 : 0);
+    return `<div class="vday" title="${x.date}
+计划 ${fmtDur(x.planned)}
+实际 ${fmtDur(x.actual)}">
+      <svg width="46" height="${H}" viewBox="0 0 46 ${H}">
+        <line x1="3" y1="${BASE + .5}" x2="43" y2="${BASE + .5}" stroke="#EDE5DA"/>
+        <rect x="7" y="${BASE - hp}" width="14" height="${hp}" rx="3" fill="#F0C9A8"/>
+        <rect x="25" y="${BASE - ha}" width="14" height="${ha}" rx="3" fill="#35C29A"/>
+        <text x="23" y="${H - 2}" font-size="9" fill="#B3A99C" text-anchor="middle">${x.label}</text>
+      </svg></div>`;
+  }).join('');
+  const card3 = `<div class="card">
+    <h3>近 7 天<span><i style="color:#F0C9A8">▮</i>计划 <i style="color:#35C29A">▮</i>实际</span></h3>
+    <div class="vdays">${bars}</div>
+  </div>`;
+
+  /* ---- 4. 排得准不准 ---- */
+  const card4 = `<div class="card">
+    <h3>排得准不准<span>只算计过时的 ${v.timedCount} 件</span></h3>
+    <div class="vs-tally">
+      <div class="over"><b>${v.over.n}</b><span>排多了</span></div>
+      <div class="under"><b>${v.under.n}</b><span>超时了</span></div>
+      <div class="ok"><b>${v.onTime}</b><span>差 10 分内</span></div>
+    </div>
+    <div class="cut-tip" style="margin:12px 0 0">
+      排多了 ${v.over.n} 件，一共多排了 <b>${fmtDur(v.over.min)}</b>；
+      超时 ${v.under.n} 件，一共超了 <b>${fmtDur(v.under.min)}</b>。<br>
+      每件平均差 <b>±${fmtDur(v.avgAbs)}</b> —— 这就是你估时长的准头。
+    </div>
+  </div>`;
+
+  /* ---- 5. 偏差最大的 ---- */
+  const worst = v.worst.filter(r => Math.abs(r.diff) >= 5).slice(0, 12);
+  const card5 = worst.length ? `<div class="card">
+    <h3>差得最多的几条<span>实际 − 计划</span></h3>
+    ${worst.map(r => {
+      const c = kindOf(r.kind);
+      const day = String(r.start).slice(5, 10).replace('-', '/');
+      return `<div class="vs-item">
+        <span class="em">${c.emoji}</span>
+        <span class="tt">${esc(r.title)}</span>
+        <span class="dd">${day}</span>
+        <span class="pa">${fmtDur(r.plan)} → ${fmtDur(r.actual)}</span>
+        <span class="df ${dfCls(r.diff)}">${dfTxt(r.diff)}</span>
+      </div>`;
+    }).join('')}
+  </div>` : '';
+
+  box.innerHTML = [card1, card4, card2, card3, card5].join('');
 }
 
 function cardByCat(d) {
@@ -3074,8 +3337,8 @@ $('sheet').addEventListener('click', e => { if (e.target === $('sheet')) closeSh
 const SCHED_DAYS = ['今天', '明天', '后天'];
 let schedItem = null, schedDay = 0;
 
-/** 那一天的 09:00 往后推 min 分钟 */
-const slotAt = (dk, min) => new Date(parse(dk + 'T09:00').getTime() + min * 60000);
+/** 那一天的 DAY_FROM 点往后推 min 分钟 */
+const slotAt = (dk, min) => new Date(parse(dk + 'T' + p2(DAY_FROM) + ':00').getTime() + min * 60000);
 function schedDayKey(offset) {
   const d = parse(S.todayKey + 'T12:00');
   d.setDate(d.getDate() + offset);
@@ -3141,7 +3404,9 @@ function paintSched() {
     .filter(e => String(e.start).slice(0, 10) === dk && !e.done && !(mine && e.taskId === mine))
     .map(e => e.start));
   const out = [];
-  for (let m = 0; m <= 17 * 60 - 30; m += 30) {
+  // 从 DAY_FROM 铺到次日 02:00，正好是一整天的长度
+  const dayMin = Math.round((parse(S.dayEnd) - parse(S.dayStart)) / 60000);
+  for (let m = 0; m + 30 <= dayMin; m += 30) {
     const d = slotAt(dk, m);
     out.push(`<button data-min="${m}" class="${busy.has(T(d)) ? 'busy' : ''}${d < now ? ' past' : ''}">${hhmm(d)}</button>`);
   }
@@ -3200,6 +3465,8 @@ $('side-tabs').querySelectorAll('.stab').forEach(b => b.addEventListener('click'
 $('add-btn').onclick = () => openSheet('task');
 $('stats-btn').onclick = openStats;
 $('ov-back').onclick = closeStats;
+$('vs-btn').onclick = openVs;
+$('vs-back').onclick = closeVs;
 
 /* ---- 翻日子：昨天 / 明天 ---- */
 async function gotoDay(day) {
@@ -3248,12 +3515,15 @@ $('cut-save').onclick = async () => {
   toast('截止时间改好了');
 };
 
-$('ov-seg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-  $('ov-seg').querySelectorAll('button').forEach(x => x.classList.remove('on'));
-  b.classList.add('on');
-  statsRange = b.dataset.r;
-  refreshStats();
-}));
+// 两个页面的「今天/本周/本月」共用一份数据，切哪个都重算
+for (const seg of ['ov-seg', 'vs-seg']) {
+  $(seg).querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+    $(seg).querySelectorAll('button').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    statsRange = b.dataset.r;
+    refreshStats();
+  }));
+}
 
 $('refresh').addEventListener('click', async e => {
   e.currentTarget.classList.add('spin');
@@ -3377,9 +3647,20 @@ load();
   }
 
   /* ================= 4. 离线缓存（只在 https 或 localhost 下有效） ================= */
+  // 这里有个坑：新的 sw.js 装好之后，当前这一屏还是旧缓存渲染出来的，
+  // 要再刷一次才看得见新东西 —— 她的习惯是刷一次就以为没更新。
+  // 所以换成新 SW 接管的那一刻，自己再刷一下，一次到位。
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    let reloading = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (reloading) return;
+      reloading = true;
+      location.reload();
+    });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => { });
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        reg.update().catch(() => { });
+      }).catch(() => { });
     });
   }
 })();
