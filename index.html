@@ -280,15 +280,22 @@
   .row{
     display:flex; align-items:center; gap:7px; padding:6px 7px; border-radius:10px;
     cursor:grab; margin-bottom:3px; background:#fff; box-shadow:var(--shadow);
-    border:1px solid transparent;
+    border:1px solid transparent; position:relative;
     transition:transform .15s var(--bounce), box-shadow .15s, opacity .15s;
   }
   .row:hover{transform:translateY(-1px); box-shadow:0 5px 14px rgba(130,96,64,.13);}
   .row:active{cursor:grabbing;}
   .row.dragging{opacity:.35;}
-  /* 长按满 380ms 才解锁拖动，这之前给个「可以拖了」的手感 */
+  /* 长按解锁拖动：按住这段时间里底下走一条进度条，走满了才拖得动 */
   .row.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
   .chip.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
+  .row.arming{background:#FFFBF5;}
+  .chip.arming{background:#FFFBF5;}
+  .row.arming::after, .chip.arming::after{
+    content:''; position:absolute; left:6px; right:6px; bottom:0; height:2.5px;
+    border-radius:2px; background:var(--c); opacity:.75;
+    transform:scaleX(var(--arm-p, 0)); transform-origin:left;
+  }
   .row .grip{color:#D5C9B9; font-size:11px; flex:none;}
   .row .bar{width:3px; height:15px; border-radius:2px; flex:none; background:var(--c);}
   .row .txt{flex:1; min-width:0; font-size:12.5px; line-height:1.35; cursor:text;
@@ -328,7 +335,7 @@
 
   .chips{display:flex; flex-wrap:wrap; gap:6px; padding-top:2px;}
   .chip{
-    display:inline-flex; align-items:center; gap:6px; cursor:grab;
+    display:inline-flex; align-items:center; gap:6px; cursor:grab; position:relative;
     background:#fff; border-radius:9px; padding:5px 9px; font-size:12px; max-width:100%;
     box-shadow:var(--shadow);
     transition:transform .15s var(--bounce), box-shadow .15s, opacity .15s;
@@ -2728,6 +2735,7 @@ function todoRow(t, c, isDoneSection) {
   if (!isDoneSection) {
     longPressDrag(el);
     el.addEventListener('dragstart', e => {
+      if (!armed(e)) return;
       dragItem = { src:'task', id:t.id, title:t.title, kind:normK(t.kind), estMin:t.estMin };
       el.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'copyMove';
@@ -2770,32 +2778,76 @@ const clearDropMarks = () => document.querySelectorAll('.drop-target').forEach(n
 
 /**
  * 长按才解锁拖动。
- * 原来 draggable 一直是 true，鼠标一抖整行就被拖走了 —— 现在要按住 380ms，
- * 中途移动超过 8px 就当普通点击，不算拖。
+ * 原来 draggable 一直是 true，鼠标一抖整行就被拖走了。
+ * 现在要按住 ARM_MS 毫秒，中途移动超过 8px 就当普通点击，不算长按。
+ * 另外 dragstart 里还有一道保险：没解锁过的一律 preventDefault ——
+ * 选中标题文字再拖也会触发 dragstart，光靠 draggable 挡不住。
+ *
+ * 松手可能落在别的元素上，所以 pointermove/up 挂在 window 上；
+ * 但待办列表每次刷新都会重建行，挂在 window 上的监听会一批批漏，
+ * 所以 window 上只挂一次，用这一组模块级变量记「现在谁在长按」。
  */
+const ARM_MS = 5000;
+let armEl = null, armTimer = null, armRaf = 0, armX = 0, armY = 0;
+
+function armCancel() {
+  clearTimeout(armTimer); armTimer = null;
+  cancelAnimationFrame(armRaf); armRaf = 0;
+  if (armEl) {
+    armEl.draggable = false;
+    armEl.classList.remove('arm', 'arming');
+    armEl.style.removeProperty('--arm-p');
+  }
+  armEl = null;
+}
+
 function longPressDrag(el) {
-  let timer = null, sx = 0, sy = 0;
-  const arm = () => { timer = null; el.draggable = true; el.classList.add('arm'); };
-  const reset = () => {
-    clearTimeout(timer); timer = null;
-    el.draggable = false;
-    el.classList.remove('arm');
-  };
   el.draggable = false;
   el.addEventListener('pointerdown', e => {
     if (e.button !== 0) return;
     if (e.target.closest('button, input, .chk')) return;   // 按在按钮/勾选框上不算
-    sx = e.clientX; sy = e.clientY;
-    clearTimeout(timer);
-    timer = setTimeout(arm, 380);
+    armCancel();
+    armEl = el; armX = e.clientX; armY = e.clientY;
+    el.classList.add('arming');
+    // 进度条用 rAF 自己走，不用 CSS animation —— 动画挂在别的时钟上，
+    // 后台标签页/无头环境里不一定走，而且这里正好要能在中途叫停
+    const t0 = performance.now();
+    el.style.setProperty('--arm-p', '0');
+    const tick = now => {
+      if (armEl !== el) return;
+      // rAF 的时间戳是「这一帧开始」的时刻，可能比按下那一刻还早，
+      // 不夹一下会出现负的 scaleX
+      const p = Math.max(0, Math.min(1, (now - t0) / ARM_MS));
+      el.style.setProperty('--arm-p', p.toFixed(3));
+      if (p < 1) armRaf = requestAnimationFrame(tick);
+    };
+    armRaf = requestAnimationFrame(tick);
+
+    armTimer = setTimeout(() => {
+      armTimer = null;
+      cancelAnimationFrame(armRaf); armRaf = 0;
+      el.draggable = true;
+      el.classList.remove('arming');
+      el.style.removeProperty('--arm-p');
+      el.classList.add('arm');
+    }, ARM_MS);
   });
-  el.addEventListener('pointermove', e => {
-    if (timer && Math.hypot(e.clientX - sx, e.clientY - sy) > 8) reset();
-  });
-  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) el.addEventListener(ev, reset);
-  el.addEventListener('dragend', reset);
+  el.addEventListener('dragend', armCancel);
   return el;
 }
+
+window.addEventListener('pointermove', e => {
+  if (armTimer && Math.hypot(e.clientX - armX, e.clientY - armY) > 8) armCancel();
+}, { passive: true });
+window.addEventListener('pointerup', armCancel);
+window.addEventListener('pointercancel', armCancel);
+
+/** dragstart 的第一道门：只有长按解锁过的才放行 */
+const armed = e => {
+  if (e.currentTarget.draggable) return true;
+  e.preventDefault();
+  return false;
+};
 
 function renderTray(box) {
   box.innerHTML = '';
@@ -2814,6 +2866,7 @@ function renderTray(box) {
       <span class="mm num">${fmtDur(t.minutes)}</span><button class="sched" title="排到时间轴">📅</button><button class="x" title="删掉">✕</button>`;
     el.title = t.onToday ? `${t.title}\n今天已经排过了` : `${t.title}\n拖进时间轴 = 排进今天`;
     el.addEventListener('dragstart', e => {
+      if (!armed(e)) return;
       dragItem = { src:'tray', id:t.id, title:t.title, kind:normK(t.kind), minutes:t.minutes };
       el.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'copy';
