@@ -158,7 +158,6 @@
   /* ---- 时间轴 ---- */
   .tl-scroll{flex:1; min-width:0; overflow-y:auto; overflow-x:hidden;
              padding:0 10px 14px 14px; position:relative;}
-  .tl-scroll.dragover{background:rgba(47,107,94,.04); border-radius:14px;}
   .tl-scroll::-webkit-scrollbar,.side-body::-webkit-scrollbar,
   .ov-body::-webkit-scrollbar{width:7px;}
   .tl-scroll::-webkit-scrollbar-thumb,.side-body::-webkit-scrollbar-thumb,
@@ -216,14 +215,6 @@
   .nowline i{position:absolute; left:-4px; top:-3.5px; width:7px; height:7px; border-radius:50%;
              background:var(--now); animation:pulse 2.2s infinite;}
 
-  .dropline{
-    position:absolute; left:44px; right:0; height:34px; border-radius:9px; display:none;
-    border:1.5px dashed #9DBDB2; background:rgba(47,107,94,.08);
-    align-items:center; justify-content:center; font-size:11.5px; color:#2F6B5E;
-    z-index:6; pointer-events:none;
-  }
-  .dropline.on{display:flex;}
-
   .empty{position:absolute; left:0; right:0; top:0; bottom:0;
          display:flex; flex-direction:column; align-items:center; justify-content:center;
          gap:8px; pointer-events:none;}
@@ -279,23 +270,11 @@
 
   .row{
     display:flex; align-items:center; gap:7px; padding:6px 7px; border-radius:10px;
-    cursor:grab; margin-bottom:3px; background:#fff; box-shadow:var(--shadow);
+    margin-bottom:3px; background:#fff; box-shadow:var(--shadow);
     border:1px solid transparent; position:relative;
     transition:transform .15s var(--bounce), box-shadow .15s, opacity .15s;
   }
   .row:hover{transform:translateY(-1px); box-shadow:0 5px 14px rgba(130,96,64,.13);}
-  .row:active{cursor:grabbing;}
-  .row.dragging{opacity:.35;}
-  /* 长按解锁拖动：按住这段时间里底下走一条进度条，走满了才拖得动 */
-  .row.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
-  .chip.arm{cursor:grab; box-shadow:0 6px 16px rgba(130,96,64,.16); transform:translateY(-1px);}
-  .row.arming{background:#FFFBF5;}
-  .chip.arming{background:#FFFBF5;}
-  .row.arming::after, .chip.arming::after{
-    content:''; position:absolute; left:6px; right:6px; bottom:0; height:2.5px;
-    border-radius:2px; background:var(--c); opacity:.75;
-    transform:scaleX(var(--arm-p, 0)); transform-origin:left;
-  }
   .row .grip{color:#D5C9B9; font-size:11px; flex:none;}
   .row .bar{width:3px; height:15px; border-radius:2px; flex:none; background:var(--c);}
   .row .txt{flex:1; min-width:0; font-size:12.5px; line-height:1.35; cursor:text;
@@ -311,8 +290,15 @@
   }
   .row:hover .play{opacity:1;}
   .row .play:hover{color:#21896A; transform:scale(1.3);}
-  .row .sched{display:none;}
-  .chip .sched{display:none;}
+  /* 排到时间轴的入口 —— 取消拖拽之后，这就是唯一的路 */
+  .row .sched, .chip .sched{
+    display:inline-flex; align-items:center; justify-content:center;
+    border:0; background:transparent; color:#C9BCAC; cursor:pointer;
+    width:22px; height:22px; border-radius:7px; font-size:11px; flex:none; padding:0;
+    opacity:.7; transition:opacity .15s, background .15s, color .15s, transform .15s var(--bounce);
+  }
+  .row:hover .sched, .chip:hover .sched{opacity:1;}
+  .row .sched:hover, .chip .sched:hover{background:#F4EEE6; color:var(--ink); transform:translateY(-1px);}
   .row.running{box-shadow:0 0 0 1.5px var(--c) inset, var(--shadow);}
   .row.running .play{opacity:1; color:#E4573D;}
   .row .chk{
@@ -331,18 +317,15 @@
   }
   .row:hover .del{opacity:1;}
   .row .del:hover{color:#C9503A;}
-  .row.drop-target{box-shadow:0 -2px 0 0 #35C29A inset, var(--shadow);}
 
   .chips{display:flex; flex-wrap:wrap; gap:6px; padding-top:2px;}
   .chip{
-    display:inline-flex; align-items:center; gap:6px; cursor:grab; position:relative;
+    display:inline-flex; align-items:center; gap:6px; position:relative;
     background:#fff; border-radius:9px; padding:5px 9px; font-size:12px; max-width:100%;
     box-shadow:var(--shadow);
     transition:transform .15s var(--bounce), box-shadow .15s, opacity .15s;
   }
   .chip:hover{transform:translateY(-1px); box-shadow:0 5px 14px rgba(130,96,64,.13);}
-  .chip:active{cursor:grabbing;}
-  .chip.dragging{opacity:.35;}
   .chip .bar{width:3px; height:13px; border-radius:2px; flex:none; background:var(--c);}
   .chip .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:148px; cursor:text;}
   .chip .mm{font-size:10px; color:var(--ink3); flex:none;}
@@ -602,6 +585,27 @@
   .sheet .sh-hint{font-size:10.5px; color:#C4B8A8; margin-top:6px;}
   .sheet .sh-hint b{color:var(--now); font-weight:600;}
 
+  /* ---- 排到时间轴：选日子 + 点时间点 ---- */
+  .sched-days{display:flex; gap:6px; margin-bottom:10px;}
+  .sched-days button{
+    flex:1; border:1.5px solid var(--line2); background:#fff; border-radius:10px;
+    padding:8px 0; font-size:12.5px; color:var(--ink3); cursor:pointer;
+    transition:border-color .15s, background .15s, color .15s;
+  }
+  .sched-days button.on{border-color:#F0A879; background:#FFF4EC; color:var(--ink); font-weight:600;}
+  .sched-times{
+    display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
+    max-height:44vh; overflow-y:auto; padding:2px 2px 4px;
+  }
+  .sched-times button{
+    border:1px solid var(--line2); background:#fff; border-radius:9px;
+    padding:9px 0; font-size:12px; color:var(--ink2); cursor:pointer;
+    transition:background .12s, border-color .12s, transform .12s var(--bounce);
+  }
+  .sched-times button:hover{background:#F8F1E8;}
+  .sched-times button.busy{background:#F4EEE6; color:#B8AFA2;}
+  .sched-times button.past{opacity:.4;}
+
   .sheet .footrow{display:flex; align-items:center; gap:10px; margin-top:14px;}
   .sheet .footrow .flabel{font-size:12px; color:var(--ink3); flex:none;}
   .sheet .stepper{
@@ -719,18 +723,6 @@ body.side-collapsed .side-open-btn{ display:none; }
 
 
 
-/* ---- 排程按钮：手机上不用拖拽，改成点 ---- */
-.row .sched, .chip .sched{
-  display:inline-flex; align-items:center; justify-content:center;
-  border:0; background:#F4EEE6; color:#9C8F7F; cursor:pointer;
-  width:24px; height:24px; border-radius:8px; font-size:11px; flex:none;
-  opacity:1; transition:background .15s, color .15s, transform .15s var(--bounce);
-}
-.row .sched:hover, .chip .sched:hover{ background:#EAE0D3; color:var(--ink); transform:translateY(-1px); }
-.row .play{ opacity:1; width:22px; height:24px; font-size:11px; }
-.row .del{ opacity:1; font-size:15px; padding:0 4px; }
-.chip .x{ opacity:1; font-size:14px; padding:0 3px; }
-
 /* ---- 行高、点击区域放大 ---- */
 .row{ padding:9px 9px; margin-bottom:5px; }
 .row .txt{ font-size:13px; }
@@ -746,28 +738,6 @@ body.side-collapsed .side-open-btn{ display:none; }
 .ov-body{ padding:4px 12px 24px; }
 .ov-head{ padding:10px 12px 8px; }
 .ov-head .back{ padding:8px 14px; }
-
-/* ---- 排程面板 ---- */
-.sched-days{ display:flex; gap:6px; margin-bottom:10px; }
-.sched-days button{
-  flex:1; border:1.5px solid var(--line2); background:#fff; border-radius:10px;
-  padding:8px 0; font-size:12.5px; color:var(--ink3); cursor:pointer;
-  transition:border-color .15s, background .15s, color .15s;
-}
-.sched-days button.on{ border-color:#F0A879; background:#FFF4EC; color:var(--ink); font-weight:600; }
-.sched-times{
-  display:grid; grid-template-columns:repeat(4,1fr); gap:6px;
-  max-height:44vh; overflow-y:auto; padding:2px 2px 4px;
-}
-.sched-times button{
-  border:1px solid var(--line2); background:#fff; border-radius:9px;
-  padding:9px 0; font-size:12px; color:var(--ink2); cursor:pointer;
-  transition:background .12s, border-color .12s, transform .12s var(--bounce);
-}
-.sched-times button:hover{ background:#F8F1E8; }
-.sched-times button.busy{ background:#F4EEE6; color:#B8AFA2; }
-.sched-times button.past{ opacity:.4; }
-.sched-tip{ font-size:11px; color:var(--ink3); margin:-4px 0 9px; }
 
 /* ---- 备份 ---- */
 .backup-row{ display:flex; gap:8px; margin-top:10px; }
@@ -1622,7 +1592,7 @@ return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, 
     <circle cx="59" cy="40" r="3" fill="#F6B9A0" opacity=".65"/>
   </svg>
   <p>今天还什么都没排呢</p>
-  <p class="hint">把右边的待办拖过来，或者双击时间轴</p>
+  <p class="hint">点右边待办上的 📅 排进来，或者双击时间轴</p>
 </template>
 
 <div class="app">
@@ -1673,7 +1643,6 @@ return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, 
   <div class="main">
     <div class="tl-scroll" id="tl-scroll">
       <div class="tl" id="tl">
-        <div class="dropline" id="dropline"></div>
       </div>
     </div>
 
@@ -1776,7 +1745,6 @@ const EMPTY_HTML = document.getElementById('tpl-empty').innerHTML;
 let S = null;
 let PXH = 40;
 let pane = 'todo';
-let dragItem = null;
 let placedAt = new Map();   // 待办 id → "19:00"，今天排进时间轴的那一块
 let drag = null;
 let popBlock = null;
@@ -1967,45 +1935,6 @@ function timeFromY(clientY) {
   let min = Math.round((y / PXH) * 60 / SNAP) * SNAP;
   min = Math.max(0, Math.min(total - SNAP, min));
   return new Date(parse(S.dayStart).getTime() + min * 60000);
-}
-
-function showDrop(clientY) {
-  const t = timeFromY(clientY);
-  const el = $('dropline');
-  el.style.top = ((t - parse(S.dayStart)) / 3600000 * PXH) + 'px';
-  el.textContent = `放到 ${hhmm(t)}`;
-  el.classList.add('on');
-}
-const hideDrop = () => $('dropline').classList.remove('on');
-
-function bindDropZone() {
-  const scroll = $('tl-scroll');
-  scroll.addEventListener('dragover', e => {
-    if (!dragItem || !S) return;
-    e.preventDefault();
-    e.dataTransfer.dropEffect = 'copy';
-    scroll.classList.add('dragover');
-    showDrop(e.clientY);
-  });
-  scroll.addEventListener('dragleave', e => {
-    if (e.relatedTarget && scroll.contains(e.relatedTarget)) return;
-    scroll.classList.remove('dragover'); hideDrop();
-  });
-  scroll.addEventListener('drop', async e => {
-    e.preventDefault();
-    scroll.classList.remove('dragover'); hideDrop();
-    if (!dragItem || !S) return;
-    const item = dragItem;
-    const t = timeFromY(e.clientY);
-    dragItem = null;
-    await call('/api/block/add', {
-      title: item.title, kind: item.kind,
-      taskId: item.src === 'task' ? item.id : null,
-      start: T(t), minutes: item.estMin || item.minutes || DEFAULT_MIN,
-    });
-    await load();
-    toast(`已排入「${item.title}」`);
-  });
 }
 
 /* ================= 已有日程块：拖动 / 拉长 / 点开 ================= */
@@ -2712,9 +2641,7 @@ function todoRow(t, c, isDoneSection) {
   const sc = el.querySelector('.sched');
   if (sc) sc.onclick = e => {
     e.stopPropagation();
-    if (window.MOBILE_SCHEDULE) {
-      window.MOBILE_SCHEDULE({ src: 'task', id: t.id, title: t.title, kind: normK(t.kind), estMin: t.estMin });
-    }
+    openSchedule({ src: 'task', id: t.id, title: t.title, kind: normK(t.kind), estMin: t.estMin });
   };
 
   el.querySelector('.chk').onclick = async e => {
@@ -2731,155 +2658,28 @@ function todoRow(t, c, isDoneSection) {
     toast('已删掉这条待办');
   };
   el.querySelector('.txt').onclick = () => openSheet('task', t);
-
-  if (!isDoneSection) {
-    longPressDrag(el);
-    el.addEventListener('dragstart', e => {
-      if (!armed(e)) return;
-      dragItem = { src:'task', id:t.id, title:t.title, kind:normK(t.kind), estMin:t.estMin };
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'copyMove';
-      e.dataTransfer.setData('text/plain', t.title);
-    });
-    el.addEventListener('dragend', () => {
-      el.classList.remove('dragging');
-      dragItem = null;
-      clearDropMarks();
-    });
-    el.addEventListener('dragover', e => {
-      if (!dragItem || dragItem.src !== 'task') return;
-      if (dragItem.kind !== normK(t.kind) || dragItem.id === t.id) return;
-      e.preventDefault();
-      clearDropMarks();
-      el.classList.add('drop-target');
-    });
-    el.addEventListener('dragleave', () => el.classList.remove('drop-target'));
-    el.addEventListener('drop', async e => {
-      e.preventDefault();
-      clearDropMarks();
-      if (!dragItem || dragItem.src !== 'task' || dragItem.kind !== normK(t.kind)) return;
-      const kind = normK(t.kind);
-      const draggedId = dragItem.id;
-      const list = S.tasks.filter(x => normK(x.kind) === kind && !x.done).map(x => x.id);
-      const from = list.indexOf(draggedId);
-      const to = list.indexOf(t.id);
-      dragItem = null;
-      if (from === -1 || to === -1 || from === to) return;
-      list.splice(from, 1);
-      list.splice(to, 0, draggedId);
-      await call('/api/task/reorder', { kind, ids: list });
-      await load();
-    });
-  }
   return el;
 }
-
-const clearDropMarks = () => document.querySelectorAll('.drop-target').forEach(n => n.classList.remove('drop-target'));
-
-/**
- * 长按才解锁拖动。
- * 原来 draggable 一直是 true，鼠标一抖整行就被拖走了。
- * 现在要按住 ARM_MS 毫秒，中途移动超过 8px 就当普通点击，不算长按。
- * 另外 dragstart 里还有一道保险：没解锁过的一律 preventDefault ——
- * 选中标题文字再拖也会触发 dragstart，光靠 draggable 挡不住。
- *
- * 松手可能落在别的元素上，所以 pointermove/up 挂在 window 上；
- * 但待办列表每次刷新都会重建行，挂在 window 上的监听会一批批漏，
- * 所以 window 上只挂一次，用这一组模块级变量记「现在谁在长按」。
- */
-const ARM_MS = 5000;
-let armEl = null, armTimer = null, armRaf = 0, armX = 0, armY = 0;
-
-function armCancel() {
-  clearTimeout(armTimer); armTimer = null;
-  cancelAnimationFrame(armRaf); armRaf = 0;
-  if (armEl) {
-    armEl.draggable = false;
-    armEl.classList.remove('arm', 'arming');
-    armEl.style.removeProperty('--arm-p');
-  }
-  armEl = null;
-}
-
-function longPressDrag(el) {
-  el.draggable = false;
-  el.addEventListener('pointerdown', e => {
-    if (e.button !== 0) return;
-    if (e.target.closest('button, input, .chk')) return;   // 按在按钮/勾选框上不算
-    armCancel();
-    armEl = el; armX = e.clientX; armY = e.clientY;
-    el.classList.add('arming');
-    // 进度条用 rAF 自己走，不用 CSS animation —— 动画挂在别的时钟上，
-    // 后台标签页/无头环境里不一定走，而且这里正好要能在中途叫停
-    const t0 = performance.now();
-    el.style.setProperty('--arm-p', '0');
-    const tick = now => {
-      if (armEl !== el) return;
-      // rAF 的时间戳是「这一帧开始」的时刻，可能比按下那一刻还早，
-      // 不夹一下会出现负的 scaleX
-      const p = Math.max(0, Math.min(1, (now - t0) / ARM_MS));
-      el.style.setProperty('--arm-p', p.toFixed(3));
-      if (p < 1) armRaf = requestAnimationFrame(tick);
-    };
-    armRaf = requestAnimationFrame(tick);
-
-    armTimer = setTimeout(() => {
-      armTimer = null;
-      cancelAnimationFrame(armRaf); armRaf = 0;
-      el.draggable = true;
-      el.classList.remove('arming');
-      el.style.removeProperty('--arm-p');
-      el.classList.add('arm');
-    }, ARM_MS);
-  });
-  el.addEventListener('dragend', armCancel);
-  return el;
-}
-
-window.addEventListener('pointermove', e => {
-  if (armTimer && Math.hypot(e.clientX - armX, e.clientY - armY) > 8) armCancel();
-}, { passive: true });
-window.addEventListener('pointerup', armCancel);
-window.addEventListener('pointercancel', armCancel);
-
-/** dragstart 的第一道门：只有长按解锁过的才放行 */
-const armed = e => {
-  if (e.currentTarget.draggable) return true;
-  e.preventDefault();
-  return false;
-};
 
 function renderTray(box) {
   box.innerHTML = '';
   const chips = document.createElement('div');
   chips.className = 'chips';
   if (!S.tray.length) {
-    chips.innerHTML = '<div class="empty-note" style="width:100%">托盘是空的<br>把每天固定要做的事放这儿，拖进时间轴就行</div>';
+    chips.innerHTML = '<div class="empty-note" style="width:100%">托盘是空的<br>把每天固定要做的事放这儿，点 📅 排进时间轴</div>';
   }
   for (const t of S.tray) {
     const c = kindOf(t.kind);
     const el = document.createElement('div');
     el.className = 'chip' + (t.onToday ? ' on-day' : '');
     el.style.setProperty('--c', c.color);
-    longPressDrag(el);
     el.innerHTML = `<span class="bar"></span><span class="nm">${esc(t.title)}</span>
       <span class="mm num">${fmtDur(t.minutes)}</span><button class="sched" title="排到时间轴">📅</button><button class="x" title="删掉">✕</button>`;
-    el.title = t.onToday ? `${t.title}\n今天已经排过了` : `${t.title}\n拖进时间轴 = 排进今天`;
-    el.addEventListener('dragstart', e => {
-      if (!armed(e)) return;
-      dragItem = { src:'tray', id:t.id, title:t.title, kind:normK(t.kind), minutes:t.minutes };
-      el.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'copy';
-      e.dataTransfer.setData('text/plain', t.title);
-    });
-    el.addEventListener('dragend', () => { el.classList.remove('dragging'); dragItem = null; });
+    el.title = t.onToday ? `${t.title}\n今天已经排过了` : `${t.title}\n点 📅 排到时间轴`;
     el.querySelector('.nm').onclick = () => openSheet('tray', t);
-    const tsc = el.querySelector('.sched');
-    if (tsc) tsc.onclick = e => {
+    el.querySelector('.sched').onclick = e => {
       e.stopPropagation();
-      if (window.MOBILE_SCHEDULE) {
-        window.MOBILE_SCHEDULE({ src: 'tray', id: t.id, title: t.title, kind: normK(t.kind), minutes: t.minutes });
-      }
+      openSchedule({ src: 'tray', id: t.id, title: t.title, kind: normK(t.kind), minutes: t.minutes });
     };
     el.querySelector('.x').onclick = async e => {
       e.stopPropagation();
@@ -3174,7 +2974,7 @@ function openSheet(mode, task, presetKind, slot) {
       const v = stIn.value;
       const min = Number($('sh-min').value) || DEFAULT_MIN;
       if (!v) {
-        hint.innerHTML = '不填 = 只放进待办，之后再拖到时间轴';
+        hint.innerHTML = '不填 = 只放进待办，之后点 📅 再排';
         return;
       }
       const s = atClock(parse(S.dayStart), v);
@@ -3243,6 +3043,111 @@ async function saveSheet() {
 
 function closeSheet() { $('sheet').classList.remove('on'); sheetCtx = null; }
 $('sheet').addEventListener('click', e => { if (e.target === $('sheet')) closeSheet(); });
+
+/* ================= 排到时间轴 =================
+   待办 / 托盘点 📅 进来的。以前靠拖拽，拖拽取消之后这就是唯一的路，
+   所以电脑和手机共用这一套（手机上手点比拖好用得多）。
+   选日期 → 点时间点 → 直接建一块并挂上 taskId。
+------------------------------------------------- */
+const SCHED_DAYS = ['今天', '明天', '后天'];
+let schedItem = null, schedDay = 0;
+
+/** 那一天的 09:00 往后推 min 分钟 */
+const slotAt = (dk, min) => new Date(parse(dk + 'T09:00').getTime() + min * 60000);
+function schedDayKey(offset) {
+  const d = parse(S.todayKey + 'T12:00');
+  d.setDate(d.getDate() + offset);
+  return T(d).slice(0, 10);
+}
+
+function ensureSchedSheet() {
+  if ($('sched-sheet')) return;
+  const box = document.createElement('div');
+  box.className = 'sheet';
+  box.id = 'sched-sheet';
+  box.innerHTML = `
+    <div class="sheet-in">
+      <h4 id="sched-title">排到什么时候</h4>
+      <div class="sched-days" id="sched-days"></div>
+      <div class="sched-times" id="sched-times"></div>
+      <div class="footrow">
+        <button class="ghost" id="sched-now">现在就做</button>
+        <button class="save" id="sched-cancel">取消</button>
+      </div>
+    </div>`;
+  document.querySelector('.app').appendChild(box);
+  box.addEventListener('click', e => { if (e.target === box) closeSched(); });
+  $('sched-days').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    schedDay = Number(b.dataset.d);
+    paintSched();
+  });
+  $('sched-times').addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b || b.disabled) return;
+    schedPlace(Number(b.dataset.min));
+  });
+  $('sched-cancel').onclick = closeSched;
+  $('sched-now').onclick = async () => {
+    const it = schedItem;
+    closeSched();
+    if (!it) return;
+    if (it.src === 'task') { await startTimer({ taskId: it.id }); return; }
+    const r = await call('/api/block/add', {
+      title: it.title, kind: it.kind, start: T(new Date()), minutes: it.minutes || DEFAULT_MIN,
+    });
+    if (r.ok) await startTimer({ blockId: r.id });
+  };
+}
+
+const closeSched = () => { const el = $('sched-sheet'); if (el) el.classList.remove('on'); };
+
+function paintSched() {
+  if (!schedItem || !S) return;
+  $('sched-title').textContent = `把「${schedItem.title}」排到`;
+  $('sched-days').innerHTML = SCHED_DAYS.map((n, i) => {
+    const d = parse(schedDayKey(i) + 'T12:00');
+    return `<button data-d="${i}" class="${i === schedDay ? 'on' : ''}">${n}<br>
+      <span style="font-size:10px">${d.getMonth() + 1}/${d.getDate()}</span></button>`;
+  }).join('');
+
+  const dk = schedDayKey(schedDay);
+  const now = new Date();
+  const mine = schedItem.src === 'task' ? schedItem.id : null;
+  const busy = new Set(S.events
+    .filter(e => String(e.start).slice(0, 10) === dk && !e.done && !(mine && e.taskId === mine))
+    .map(e => e.start));
+  const out = [];
+  for (let m = 0; m <= 17 * 60 - 30; m += 30) {
+    const d = slotAt(dk, m);
+    out.push(`<button data-min="${m}" class="${busy.has(T(d)) ? 'busy' : ''}${d < now ? ' past' : ''}">${hhmm(d)}</button>`);
+  }
+  $('sched-times').innerHTML = out.join('');
+}
+
+async function schedPlace(min) {
+  const it = schedItem;
+  if (!it) return;
+  const d = slotAt(schedDayKey(schedDay), min);
+  closeSched();
+  await call('/api/block/add', {
+    title: it.title, kind: it.kind,
+    taskId: it.src === 'task' ? it.id : null,
+    start: T(d), minutes: it.estMin || it.minutes || DEFAULT_MIN,
+  });
+  await load();
+  toast(`已排到${SCHED_DAYS[schedDay]} ${hhmm(d)}`);
+}
+
+function openSchedule(item) {
+  schedItem = item;
+  schedDay = 0;
+  ensureSchedSheet();
+  paintSched();
+  $('sched-sheet').classList.add('on');
+  $('sched-times').scrollTop = 0;
+}
 
 /* ================= 撤销 / 提示 ================= */
 function toast(msg, undoable = true) {
@@ -3362,7 +3267,6 @@ setInterval(() => load(), 120000);
 window.addEventListener('focus', () => load());
 window.addEventListener('resize', () => { if (S) { layout(); renderTimeline(); } });
 
-bindDropZone();
 load();
 
 </script>
@@ -3382,114 +3286,6 @@ load();
       if (document.body.classList.contains('side-collapsed')) setSide(false);
     });
   });
-
-  /* ================= 2. 点一下就排进去（手机上拖拽用不了） ================= */
-  const DAY_NAMES = ['今天', '明天', '后天'];
-  let schedItem = null, schedDay = 0;
-
-  function ensureSheet() {
-    if ($('sched-sheet')) return;
-    const box = document.createElement('div');
-    box.className = 'sheet';
-    box.id = 'sched-sheet';
-    box.innerHTML = `
-      <div class="sheet-in">
-        <h4 id="sched-title">排到什么时候</h4>
-        <div class="sched-days" id="sched-days"></div>
-        <div class="sched-times" id="sched-times"></div>
-        <div class="footrow">
-          <button class="ghost" id="sched-now">现在就做</button>
-          <button class="save" id="sched-cancel">取消</button>
-        </div>
-      </div>`;
-    document.querySelector('.app').appendChild(box);
-
-    box.addEventListener('click', e => { if (e.target === box) closeSched(); });
-    $('sched-days').addEventListener('click', e => {
-      const b = e.target.closest('button');
-      if (!b) return;
-      schedDay = Number(b.dataset.d);
-      paintSched();
-    });
-    $('sched-times').addEventListener('click', e => {
-      const b = e.target.closest('button');
-      if (!b || b.disabled) return;
-      placeAt(Number(b.dataset.min));
-    });
-    $('sched-cancel').onclick = closeSched;
-    $('sched-now').onclick = async () => {
-      const it = schedItem;
-      closeSched();
-      if (!it) return;
-      if (it.src === 'task') {
-        await startTimer({ taskId: it.id });
-      } else {
-        const r = await call('/api/block/add', {
-          title: it.title, cat: it.cat, start: T(new Date()), minutes: it.minutes || DEFAULT_MIN,
-        });
-        if (r.ok) await startTimer({ blockId: r.id });
-      }
-    };
-  }
-
-  const closeSched = () => { const el = $('sched-sheet'); if (el) el.classList.remove('on'); };
-
-  /** 那一天的 09:00 往后推 min 分钟 */
-  function slotAt(dayKeyStr, min) {
-    return new Date(parse(dayKeyStr + 'T09:00').getTime() + min * 60000);
-  }
-  function dayKeyOf(offset) {
-    const base = parse(S.todayKey + 'T12:00');
-    base.setDate(base.getDate() + offset);
-    return T(base).slice(0, 10);
-  }
-
-  function paintSched() {
-    if (!schedItem || !S) return;
-    $('sched-title').textContent = `把「${schedItem.title}」排到`;
-    $('sched-days').innerHTML = DAY_NAMES.map((n, i) => {
-      const dk = dayKeyOf(i);
-      const d = parse(dk + 'T12:00');
-      return `<button data-d="${i}" class="${i === schedDay ? 'on' : ''}">${n}<br>
-        <span style="font-size:10px">${d.getMonth() + 1}/${d.getDate()}</span></button>`;
-    }).join('');
-
-    const dk = dayKeyOf(schedDay);
-    const now = new Date();
-    const busy = new Set(S.events.map(e => String(e.start).slice(0, 10) === dk ? e.start : null).filter(Boolean));
-    const slots = [];
-    for (let m = 0; m <= 17 * 60 - 30; m += 30) {
-      const d = slotAt(dk, m);
-      const key = T(d);
-      slots.push(`<button data-min="${m}" class="${busy.has(key) ? 'busy' : ''}${d < now ? ' past' : ''}">
-        ${hhmm(d)}</button>`);
-    }
-    $('sched-times').innerHTML = slots.join('');
-  }
-
-  async function placeAt(min) {
-    const it = schedItem;
-    if (!it) return;
-    const dk = dayKeyOf(schedDay);
-    const d = slotAt(dk, min);
-    closeSched();
-    await call('/api/block/add', {
-      title: it.title, cat: it.cat,
-      taskId: it.src === 'task' ? it.id : null,
-      start: T(d), minutes: it.estMin || it.minutes || DEFAULT_MIN,
-    });
-    await load();
-    toast(`已排到 ${schedDay === 0 ? '今天' : DAY_NAMES[schedDay]} ${hhmm(d)}`);
-  }
-
-  window.MOBILE_SCHEDULE = function (item) {
-    schedItem = item;
-    schedDay = 0;
-    ensureSheet();
-    paintSched();
-    $('sched-sheet').classList.add('on');
-    $('sched-times').scrollTop = 0;
-  };
 
   /* ================= 3. 备份：挂在统计页最下面 ================= */
   const origRenderStats = renderStats;

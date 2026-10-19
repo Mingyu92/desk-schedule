@@ -1,5 +1,5 @@
 /* 日程 · 离线缓存。改了文件就把版本号 +1 */
-const CACHE = 'desk-schedule-v5';
+const CACHE = 'desk-schedule-v6';
 const FILES = ['index.html', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
