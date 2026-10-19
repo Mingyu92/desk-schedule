@@ -7,19 +7,15 @@
 里面有什么
 ----------
   index.html              主程序（单文件，含界面 + 内核 + 本地存储）
-  pomodoro.html           番茄钟（第三方 sidsurakanti/pomodoro-timer，MIT）
-  pomodoro-settings.html  番茄钟的设置页
   manifest.webmanifest    加到主屏幕要用的
   sw.js                   离线缓存
   icon-192.png / 512      图标
 
 怎么装到手机
 ------------
-1. 把这个文件夹整个传到网上（比如 GitHub Pages），或者放到任意一个
-   https 的静态站上。必须走 https，否则"添加到主屏幕"和离线缓存都不生效。
-2. 手机 Chrome 打开那个网址
+1. 这个文件夹是推到 GitHub Pages 上的（仓库 Mingyu92/desk-schedule）
+2. 手机 Chrome 打开 https://mingyu92.github.io/desk-schedule/
 3. 右上角菜单 → 添加到主屏幕
-4. 桌面就多一个图标，点开是全屏的
 
 数据在哪
 --------
@@ -32,4 +28,4 @@
 同一套界面代码、同一个内核（core.js）。
 电脑版数据在 data\store.json，手机版在浏览器本地，两边各记各的。
 
-本次构建：2026/10/19 17:06:50
+本次构建：2026/10/19 18:15:42

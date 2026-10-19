@@ -234,7 +234,25 @@
   .side{
     width:264px; flex:none; display:flex; flex-direction:column; min-height:0;
     border-left:1px solid var(--line); background:rgba(255,255,255,.55);
+    position:relative; transition:width .22s var(--bounce);
   }
+  .side-fold{
+    flex:none; border:0; background:transparent; color:var(--ink3); cursor:pointer;
+    font-size:13px; line-height:1; padding:4px 5px; border-radius:8px;
+    transition:background .15s, color .15s;
+  }
+  .side-fold:hover{background:#F3EADF; color:var(--ink);}
+  .side-open-btn{
+    display:none; position:absolute; left:50%; top:8px; transform:translateX(-50%);
+    border:0; background:transparent; color:var(--ink3); cursor:pointer;
+    font-size:13px; line-height:1; padding:5px; border-radius:8px;
+    transition:background .15s, color .15s;
+  }
+  .side-open-btn:hover{background:#F3EADF; color:var(--ink);}
+  body.side-collapsed .side{width:26px; min-width:26px;}
+  body.side-collapsed .side-tabs,
+  body.side-collapsed .side-body{display:none;}
+  body.side-collapsed .side-open-btn{display:block;}
   .side-tabs{display:flex; gap:2px; padding:8px 10px 6px; flex:none;}
   .stab{
     flex:1; border:0; background:transparent; cursor:pointer; padding:5px 4px; border-radius:9px;
@@ -385,8 +403,6 @@
   .seg button.on{background:#fff; color:var(--ink); font-weight:600; box-shadow:var(--shadow);}
   .ov-body{flex:1; min-height:0; overflow-y:auto; padding:4px 18px 22px;
            display:flex; flex-direction:column; gap:12px;}
-  .pomo-tip{margin-left:auto; font-size:11px; color:var(--ink3);}
-  #pomo iframe{flex:1; min-height:0; width:100%; border:0; background:#2b2d33;}
 
   .card{background:#fff; border-radius:16px; padding:14px 16px; box-shadow:var(--shadow);
         animation:fade .25s ease;}
@@ -477,6 +493,18 @@
   .catsel button .e{display:block; font-size:14px; margin-bottom:1px;}
   .catsel button:hover{transform:translateY(-1px);}
   .catsel button.on{border-color:var(--c); background:var(--s); color:#3A342E; font-weight:600;}
+
+  /* ---- 子类别：7 个，一行放不下，让它换行 ---- */
+  .kindbar{display:flex; flex-wrap:wrap; gap:5px; margin-bottom:6px;}
+  .kindbar button{
+    flex:1 1 30%; border:1.5px solid var(--line2); background:#fff; border-radius:9px; cursor:pointer;
+    padding:6px 2px 5px; font-size:10.5px; color:var(--ink3); line-height:1.2;
+    transition:transform .15s var(--bounce), border-color .15s, background .15s;
+  }
+  .kindbar button .e{display:block; font-size:14px; margin-bottom:1px;}
+  .kindbar button:hover{transform:translateY(-1px);}
+  .kindbar button.on{border-color:var(--c); background:var(--s); color:#3A342E; font-weight:600;}
+  .kindtip{font-size:10.5px; color:#C4B8A8; margin-bottom:9px;}
 
   /* ================= 超时弹窗 ================= */
   .hurry{
@@ -640,19 +668,21 @@ html, body{ height:100%; overscroll-behavior:none; }
 .main{ flex-direction:column; padding-top:6px; }
 .tl-scroll{ padding:0 8px 12px 10px; }
 .side{
-  width:100%; flex:none; height:auto;
+  width:100%; flex:none; height:44vh;
   border-left:0; border-top:1px solid var(--line);
   background:rgba(255,255,255,.8);
   box-shadow:0 -6px 18px rgba(130,96,64,.07);
   transition:height .22s var(--bounce);
 }
-body.side-open .side{ height:44vh; }
+/* 手机上收起只把内容藏起来，标签栏留着 —— 那三个标签就是切页的入口 */
+body.side-collapsed .side{ width:100%; height:auto; }
+body.side-collapsed .side-tabs{ display:flex; }
+body.side-collapsed .side-open-btn{ display:none; }
 .side-tabs{ padding:7px 10px 5px; }
 .stab{ padding:9px 4px; font-size:12.5px; }
 .side-body{ padding:2px 10px calc(14px + var(--sa-bottom)); }
 
-/* 面板收起时，时间轴把屏幕吃满 */
-body:not(.side-open) .side-body{ display:none; }
+
 
 /* ---- 排程按钮：手机上不用拖拽，改成点 ---- */
 .row .sched, .chip .sched{
@@ -715,7 +745,7 @@ body:not(.side-open) .side-body{ display:none; }
 </style>
 </head>
 <body>
-<script>window.BOOT = {"cats":[{"key":"biz","name":"生意","emoji":"💼","color":"#FF8A5B","soft":"#FFF0E8"},{"key":"life","name":"生活","emoji":"🌿","color":"#35C29A","soft":"#E7F8F2"},{"key":"study","name":"学业","emoji":"📚","color":"#6C8CFF","soft":"#EDF1FF"},{"key":"job","name":"找工作","emoji":"🎯","color":"#E86AA6","soft":"#FDEDF5"}],"other":{"key":"other","name":"未分类","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"}};</script>
+<script>window.BOOT = {"kinds":[{"key":"talk","name":"对话","emoji":"💬","color":"#FF8A5B","soft":"#FFF0E8","min":30},{"key":"meet","name":"会面","emoji":"🤝","color":"#35C29A","soft":"#E7F8F2","min":60},{"key":"partner","name":"伙伴会面","emoji":"👥","color":"#6C8CFF","soft":"#EDF1FF","min":60},{"key":"review","name":"复盘","emoji":"🔍","color":"#E86AA6","soft":"#FDEDF5","min":30},{"key":"audio","name":"读书音频","emoji":"🎧","color":"#E8A33D","soft":"#FFF6E8","min":30},{"key":"php","name":"回php","emoji":"💻","color":"#4FB6C4","soft":"#EAF7F9","min":30}],"other":{"key":"other","name":"其他","emoji":"·","color":"#B8B1A9","soft":"#F1EDE7"}};</script>
 <script>
 window.CORE = (function () {
 'use strict';
@@ -735,16 +765,23 @@ window.CORE = (function () {
 
 /* ---------------- 分类 ---------------- */
 // 只做展示，不做分类 —— 类别是用户自己选的，不靠关键词猜
-const CATS = [
-  { key: 'biz', name: '生意', emoji: '💼', color: '#FF8A5B', soft: '#FFF0E8' },
-  { key: 'life', name: '生活', emoji: '🌿', color: '#35C29A', soft: '#E7F8F2' },
-  { key: 'study', name: '学业', emoji: '📚', color: '#6C8CFF', soft: '#EDF1FF' },
-  { key: 'job', name: '找工作', emoji: '🎯', color: '#E86AA6', soft: '#FDEDF5' },
+/**
+ * 只有一门生意，所以分类维度换成了"子类别"——
+ * 时间统计就是按这几项摊的。
+ * 想加一项：这里加一行就行，颜色挑个没被用过的。
+ */
+const KINDS = [
+  { key: 'talk',    name: '对话',     emoji: '💬', color: '#FF8A5B', soft: '#FFF0E8', min: 30 },
+  { key: 'meet',    name: '会面',     emoji: '🤝', color: '#35C29A', soft: '#E7F8F2', min: 60 },
+  { key: 'partner', name: '伙伴会面', emoji: '👥', color: '#6C8CFF', soft: '#EDF1FF', min: 60 },
+  { key: 'review',  name: '复盘',     emoji: '🔍', color: '#E86AA6', soft: '#FDEDF5', min: 30 },
+  { key: 'audio',   name: '读书音频', emoji: '🎧', color: '#E8A33D', soft: '#FFF6E8', min: 30 },
+  { key: 'php',     name: '回php',    emoji: '💻', color: '#4FB6C4', soft: '#EAF7F9', min: 30 },
 ];
-const OTHER = { key: 'other', name: '未分类', emoji: '·', color: '#B8B1A9', soft: '#F1EDE7' };
-const ALL_CATS = [...CATS, OTHER];
-const CAT_BY_KEY = Object.fromEntries(ALL_CATS.map(c => [c.key, c]));
-const normCat = k => (CAT_BY_KEY[k] ? k : 'other');
+const OTHER = { key: 'other', name: '其他', emoji: '·', color: '#B8B1A9', soft: '#F1EDE7' };
+const ALL_KINDS = [...KINDS, OTHER];
+const KIND_BY_KEY = Object.fromEntries(ALL_KINDS.map(c => [c.key, c]));
+const normKind = k => (KIND_BY_KEY[k] ? k : 'other');
 
 /* ---------------- 时间 ---------------- */
 const p2 = n => String(n).padStart(2, '0');
@@ -903,12 +940,12 @@ function foldRunning(b, now = new Date()) {
 const runningBlock = db => db.blocks.find(b => !!b.runningSince) || null;
 
 /* ---------------- 统计 ---------------- */
-function byCatStats(blocks) {
+function byKindStats(blocks) {
   const acc = new Map(), detail = new Map();
   for (const b of blocks) {
     const m = minutesOf(b);
     if (m <= 0) continue;
-    const k = normCat(b.cat);
+    const k = normKind(b.kind);
     acc.set(k, (acc.get(k) || 0) + m);
     if (!detail.has(k)) detail.set(k, []);
     detail.get(k).push({ title: b.title, minutes: Math.round(m), start: b.start, done: !!b.done });
@@ -916,7 +953,7 @@ function byCatStats(blocks) {
   const total = [...acc.values()].reduce((a, b) => a + b, 0);
   return {
     total: Math.round(total),
-    items: ALL_CATS
+    items: ALL_KINDS
       .filter(c => acc.has(c.key))
       .map(c => ({
         key: c.key, name: c.name, emoji: c.emoji, color: c.color,
@@ -937,7 +974,7 @@ function byTaskStats(blocks) {
     if (m <= 0) continue;
     const key = b.taskId || ('t:' + String(b.title || '').trim());
     if (!acc.has(key)) {
-      acc.set(key, { key, title: b.title, cat: normCat(b.cat), minutes: 0, actual: 0, count: 0, days: new Set() });
+      acc.set(key, { key, title: b.title, kind: normKind(b.kind), minutes: 0, actual: 0, count: 0, days: new Set() });
     }
     const o = acc.get(key);
     o.minutes += m;
@@ -958,20 +995,20 @@ function trendStats(db, weeks = 8) {
   for (let i = weeks - 1; i >= 0; i--) {
     const from = weekStart(addDays(anchor, -7 * i));
     const to = atHour(addDays(from, 7), DAY_END_HOUR);
-    const cats = {};
+    const kinds = {};
     let total = 0;
     for (const b of blocksIn(db, from, to)) {
       const m = minutesOf(b);
       if (m <= 0) continue;
-      const k = normCat(b.cat);
-      cats[k] = (cats[k] || 0) + m;
+      const k = normKind(b.kind);
+      kinds[k] = (kinds[k] || 0) + m;
       total += m;
     }
     out.push({
       from: T(from), to: T(to),
       label: `${from.getMonth() + 1}/${from.getDate()}`,
       total: Math.round(total),
-      cats,
+      kinds,
     });
   }
   return out;
@@ -1038,7 +1075,7 @@ function buildStats(db, range = 'today', dayStr = null) {
   const bs = blocksIn(db, from, to);
   return {
     ok: true, range, label, from: T(from), to: T(to),
-    byCat: byCatStats(bs),
+    byKind: byKindStats(bs),
     byTask: byTaskStats(bs).slice(0, 12),
     trend: trendStats(db, 8),
     plan: planStats(db, from, to),
@@ -1052,7 +1089,7 @@ function buildState(db, dayStr = null) {
   const todayAnchor = anchorOf(now);
   const isToday = dayKey(todayAnchor) === dayKey(anchor);
 
-  const events = blocksIn(db, dayStart, dayEnd).map(b => ({ ...b, cat: normCat(b.cat) }));
+  const events = blocksIn(db, dayStart, dayEnd).map(b => ({ ...b, kind: normKind(b.kind) }));
   const planned = events.reduce((s, b) => s + clipMinutes(b, dayStart, dayEnd), 0);
   const actual = events.reduce((s, b) => s + actualMinutesOf(b, now), 0);
 
@@ -1062,7 +1099,7 @@ function buildState(db, dayStr = null) {
     blockId: run.id,
     taskId: run.taskId || null,
     title: run.title,
-    cat: normCat(run.cat),
+    kind: normKind(run.kind),
     start: run.start,
     end: run.end,
     runningSince: run.runningSince,   // 字段名跟块上保持一致，前端一套算法通用
@@ -1076,9 +1113,9 @@ function buildState(db, dayStr = null) {
     actualByTask.set(b.taskId, (actualByTask.get(b.taskId) || 0) + actualMinutesOf(b, now));
   }
 
-  const catRank = Object.fromEntries(ALL_CATS.map((c, i) => [c.key, i]));
+  const kindRank = Object.fromEntries(ALL_KINDS.map((c, i) => [c.key, i]));
   const tasks = [...db.tasks].sort((a, b) =>
-    (catRank[normCat(a.cat)] - catRank[normCat(b.cat)])
+    (kindRank[normKind(a.kind)] - kindRank[normKind(b.kind)])
     || ((a.order || 0) - (b.order || 0))
     || String(a.createdAt || '').localeCompare(String(b.createdAt || '')))
     .map(t => ({ ...t, todayActual: Math.round(actualByTask.get(t.id) || 0) }));
@@ -1087,7 +1124,7 @@ function buildState(db, dayStr = null) {
   const onToday = new Set(events.map(e => String(e.title || '').trim()));
   const tray = [...db.tray]
     .sort((a, b) => (a.order || 0) - (b.order || 0))
-    .map(t => ({ ...t, cat: normCat(t.cat), onToday: onToday.has(String(t.title || '').trim()) }));
+    .map(t => ({ ...t, kind: normKind(t.kind), onToday: onToday.has(String(t.title || '').trim()) }));
 
   const ideas = [...db.ideas].sort((a, b) =>
     (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0)
@@ -1180,18 +1217,18 @@ const findIdea = (db, id) => {
 };
 
 /** 同类里最大的 order + 1，新条目排最后 */
-const nextOrder = (list, cat) =>
-  list.filter(x => normCat(x.cat) === cat).reduce((m, x) => Math.max(m, x.order || 0), -1) + 1;
+const nextOrder = (list, kind) =>
+  list.filter(x => normKind(x.kind) === kind).reduce((m, x) => Math.max(m, x.order || 0), -1) + 1;
 
 const handlers = {
   /* ---- 待办 ---- */
   '/api/task/add': w(b => `加待办「${b.title}」`, (db, b) => {
-    const cat = normCat(b.cat);
+    const kind = normKind(b.kind);
     const t = {
       id: newId('t'),
       title: mustText(b.title, '待办内容'),
-      cat,
-      order: nextOrder(db.tasks, cat),
+      kind,
+      order: nextOrder(db.tasks, kind),
       estMin: Math.max(0, optInt(b.estMin, 60)),
       note: String(b.note || '').slice(0, 2000),
       done: false,
@@ -1205,9 +1242,9 @@ const handlers = {
   '/api/task/update': w('改待办', (db, b) => {
     const t = findTask(db, mustId(b.id));
     if (b.title !== undefined) t.title = mustText(b.title, '待办内容');
-    if (b.cat !== undefined) {
-      const cat = normCat(b.cat);
-      if (cat !== normCat(t.cat)) { t.cat = cat; t.order = nextOrder(db.tasks, cat); }
+    if (b.kind !== undefined) {
+      const kind = normKind(b.kind);
+      if (kind !== normKind(t.kind)) { t.kind = kind; t.order = nextOrder(db.tasks, kind); }
     }
     if (b.estMin !== undefined) t.estMin = Math.max(0, optInt(b.estMin, t.estMin));
     if (b.note !== undefined) t.note = String(b.note || '').slice(0, 2000);
@@ -1229,10 +1266,10 @@ const handlers = {
 
   /** 拖动排序：给该类一个完整的 id 顺序 */
   '/api/task/reorder': w('调整优先级', (db, b) => {
-    const cat = normCat(b.cat);
+    const kind = normKind(b.kind);
     const ids = Array.isArray(b.ids) ? b.ids.map(String) : [];
     if (!ids.length) throw bad('缺少 ids');
-    const mine = db.tasks.filter(t => normCat(t.cat) === cat);
+    const mine = db.tasks.filter(t => normKind(t.kind) === kind);
     const rank = new Map(ids.map((id, i) => [id, i]));
     // 名单里没提到的排在后面，保持原来的相对顺序
     mine.sort((a, c) => {
@@ -1249,7 +1286,7 @@ const handlers = {
     const t = {
       id: newId('r'),
       title: mustText(b.title, '托盘内容'),
-      cat: normCat(b.cat),
+      kind: normKind(b.kind),
       minutes: Math.max(5, optInt(b.minutes, 60)),
       order: db.tray.reduce((m, x) => Math.max(m, x.order || 0), -1) + 1,
     };
@@ -1260,7 +1297,7 @@ const handlers = {
   '/api/tray/update': w('改托盘项', (db, b) => {
     const t = findTray(db, mustId(b.id));
     if (b.title !== undefined) t.title = mustText(b.title, '托盘内容');
-    if (b.cat !== undefined) t.cat = normCat(b.cat);
+    if (b.kind !== undefined) t.kind = normKind(b.kind);
     if (b.minutes !== undefined) t.minutes = Math.max(5, optInt(b.minutes, t.minutes));
     return { id: t.id };
   }),
@@ -1283,7 +1320,7 @@ const handlers = {
     const blk = {
       id: newId('b'),
       title: mustText(b.title, '日程内容'),
-      cat: normCat(b.cat),
+      kind: normKind(b.kind),
       taskId: b.taskId ? String(b.taskId) : null,
       start, end,
       done: false,
@@ -1299,7 +1336,7 @@ const handlers = {
   '/api/block/update': w('改日程', (db, b) => {
     const blk = findBlock(db, mustId(b.id));
     if (b.title !== undefined) blk.title = mustText(b.title, '日程内容');
-    if (b.cat !== undefined) blk.cat = normCat(b.cat);
+    if (b.kind !== undefined) blk.kind = normKind(b.kind);
     if (b.start !== undefined) blk.start = mustTime(b.start, '开始时间');
     if (b.end !== undefined) blk.end = mustTime(b.end, '结束时间');
     if (parseT(blk.end) <= parseT(blk.start)) throw bad('结束时间必须晚于开始时间');
@@ -1354,7 +1391,7 @@ const handlers = {
         blk = {
           id: newId('b'),
           title: t.title,
-          cat: normCat(t.cat),
+          kind: normKind(t.kind),
           taskId: t.id,
           start: T(now),
           end: T(new Date(now.getTime() + Math.max(5, t.estMin || 60) * 60000)),
@@ -1417,7 +1454,7 @@ const handlers = {
     const i = {
       id: newId('i'),
       text: mustText(b.text, '灵感内容'),
-      cat: b.cat ? normCat(b.cat) : null,
+      kind: b.kind ? normKind(b.kind) : null,
       pinned: false,
       createdAt: stamp(new Date()),
     };
@@ -1428,7 +1465,7 @@ const handlers = {
   '/api/idea/update': w('改灵感', (db, b) => {
     const i = findIdea(db, mustId(b.id));
     if (b.text !== undefined) i.text = mustText(b.text, '灵感内容');
-    if (b.cat !== undefined) i.cat = b.cat ? normCat(b.cat) : null;
+    if (b.kind !== undefined) i.kind = b.kind ? normKind(b.kind) : null;
     if (b.pinned !== undefined) i.pinned = !!b.pinned;
     return { id: i.id };
   }),
@@ -1440,7 +1477,7 @@ const handlers = {
     return { id };
   }),
 };
-return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, stamp, isDayStr, empty, normalize, newId, blocksIn, minutesOf, actualMinutesOf, foldRunning, runningBlock, buildState, buildStats, handlers, useStore, undo, undoable, clearUndo };
+return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, stamp, isDayStr, empty, normalize, newId, blocksIn, minutesOf, actualMinutesOf, foldRunning, runningBlock, buildState, buildStats, handlers, useStore, undo, undoable, clearUndo };
 })();
 </script>
 <script>
@@ -1452,13 +1489,6 @@ return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, sta
 (function () {
   const CORE = window.CORE;
   const KEY = 'desk.schedule.v1';
-
-  // 底部面板的状态必须赶在主脚本 layout() 之前定下来，
-  // 否则时间轴会按错误的高度算每小时多少像素。
-  // 默认收起 —— 手机上时间轴才是主角，要看待办点底下的标签就行。
-  try {
-    if (localStorage.getItem('desk.sideOpen') === '1') document.body.classList.add('side-open');
-  } catch { }
 
   function read() {
     try {
@@ -1568,7 +1598,6 @@ return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, sta
     <div class="grow"></div>
     <div class="ring" id="ring" title="今天排满度"></div>
     <div class="clock num" id="clock">--:--</div>
-    <button class="ibtn" id="pomo-btn" title="番茄钟">🍅</button>
     <button class="ibtn" id="stats-btn" title="看数据">📊</button>
     <button class="ibtn plus" id="add-btn" title="加待办 (N)">＋</button>
     <button class="ibtn" id="refresh" title="刷新">↻</button>
@@ -1610,11 +1639,13 @@ return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, sta
       </div>
     </div>
 
-    <div class="side">
+  <div class="side">
+    <button class="side-open-btn" id="side-open-btn" title="展开待办/托盘/灵感">↑</button>
       <div class="side-tabs" id="side-tabs">
         <button class="stab on" data-pane="todo">待办<i id="n-todo">0</i></button>
         <button class="stab" data-pane="tray">托盘<i id="n-tray">0</i></button>
         <button class="stab" data-pane="idea">灵感<i id="n-idea">0</i></button>
+        <button class="side-fold" id="side-fold" title="收起">↓</button>
       </div>
       <div class="side-body" id="side-body"></div>
     </div>
@@ -1632,13 +1663,6 @@ return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, sta
     <div class="ov-body" id="ov-body"></div>
   </div>
 
-  <div class="ov" id="pomo">
-    <div class="ov-head">
-      <button class="back" id="pomo-back">← 回来</button>
-      <span class="pomo-tip">番茄钟 · 25 / 5</span>
-    </div>
-    <iframe id="pomo-frame" src="about:blank" title="番茄钟"></iframe>
-  </div>
 
   <div class="sheet" id="cut-sheet">
     <div class="sheet-in">
@@ -1687,12 +1711,12 @@ return { CATS, OTHER, ALL_CATS, normCat, T, parseT, frame, anchorOf, dayKey, sta
 <script>
 
 /* ================= 基础 ================= */
-const CATS = window.BOOT ? window.BOOT.cats : [];
-const OTHER = window.BOOT ? window.BOOT.other : { key:'other', name:'未分类', emoji:'·', color:'#B8B1A9', soft:'#F1EDE7' };
-const ALL = [...CATS, OTHER];
-const CAT = Object.fromEntries(ALL.map(c => [c.key, c]));
-const normC = k => CAT[k] ? k : 'other';
-const catOf = k => CAT[k] || OTHER;
+const KINDS = window.BOOT ? window.BOOT.kinds : [];
+const OTHER = window.BOOT ? window.BOOT.other : { key:'other', name:'其他', emoji:'·', color:'#B8B1A9', soft:'#F1EDE7' };
+const ALL = [...KINDS, OTHER];
+const KIND_MAP = Object.fromEntries(ALL.map(c => [c.key, c]));
+const normK = k => KIND_MAP[k] ? k : 'other';
+const kindOf = k => KIND_MAP[k] || OTHER;
 
 const $ = id => document.getElementById(id);
 const p2 = n => String(n).padStart(2,'0');
@@ -1724,6 +1748,19 @@ let statsLoading = false;
 let toastTimer = null;
 let ideaDraft = '';
 let viewDay = null;   // null = 今天；否则 'YYYY-MM-DD'，看的是那一天
+
+/* 右边那栏能不能收起来 —— 手机上尤其需要，收起后时间轴更大 */
+const SIDE_KEY = 'desk.sideCollapsed';
+try {
+  if (localStorage.getItem(SIDE_KEY) === '1') document.body.classList.add('side-collapsed');
+} catch { }
+function setSide(collapsed) {
+  document.body.classList.toggle('side-collapsed', collapsed);
+  const f = $('side-fold');
+  if (f) f.textContent = collapsed ? '↑' : '↓';
+  try { localStorage.setItem(SIDE_KEY, collapsed ? '1' : '0'); } catch { }
+  setTimeout(() => { if (S) { layout(); renderTimeline(); } }, 240);
+}
 
 /* ---- 倒计时 ---- */
 // 被「先停一下」按掉的块，今天不再自动弹；autoTried 防同一次失败反复重试
@@ -1824,41 +1861,45 @@ function applyHash() {
 }
 
 /* ================= 布局 ================= */
-// 一屏默认铺 09:00 → 18:00，18:00 之后的往下滑
-const VIEW_FROM = 9, VIEW_TO = 18;
+// 一屏默认铺 18:00 → 24:00（她晚上做生意的时段），白天的往上滑就行
+const VIEW_FROM = 18, VIEW_TO = 24;
+const DAY_FROM = 9;          // 一天从 09:00 起床开始（算截止点用得上）
 function layout() {
   const h = $('tl-scroll').clientHeight - 10;
   const hours = (parse(S.dayEnd) - parse(S.dayStart)) / 3600000;
   const viewH = Math.max(1, Math.min(hours, VIEW_TO - VIEW_FROM));
-  PXH = Math.max(26, Math.min(84, h / viewH));
+  PXH = Math.max(26, Math.min(110, h / viewH));
 }
 
+const viewTop = dayStart => { const d = new Date(dayStart); d.setHours(VIEW_FROM, 0, 0, 0); return d; };
+const viewBottom = dayStart => { const d = new Date(dayStart); d.setHours(VIEW_TO, 0, 0, 0); return d; };
+
 /**
- * 时间轴一屏铺 09:00–18:00，所以默认停在最上面。
- * 只有「现在」不在 09:00–18:00 里（比如深夜）才自动滚到看得见现在。
- * 看别的日子一律回到最上面。
+ * 时间轴一屏铺 18:00–24:00，所以默认停在这一段的开头。
+ * 只有「现在」已经过了 24:00（熬夜到后半夜）才自动滚到现在。
+ * 这一段空着、事儿都在白天，就滚到白天那几件事上。
  */
-function scrollToNow() {
+function scrollToView() {
   if (!S) return;
   const box = $('tl-scroll');
-  if (!S.isToday) { box.scrollTop = 0; return; }
-  const now = new Date();
   const dayStart = parse(S.dayStart);
-  const top = new Date(dayStart); top.setHours(VIEW_FROM, 0, 0, 0);
-  const bottom = new Date(dayStart); bottom.setHours(VIEW_TO, 0, 0, 0);
+  const top = viewTop(dayStart), bottom = viewBottom(dayStart);
+  const now = new Date();
 
-  if (now < top || now > bottom) {          // 现在不在这一屏里（深夜）
+  if (S.isToday && now > bottom) {
     box.scrollTop = Math.max(0, (now - dayStart) / 3600000 * PXH - box.clientHeight / 3);
     return;
   }
-  box.scrollTop = 0;
-  // 这一屏空空如也、事儿全在 18:00 之后 —— 比如晚上才开工的，直接滚过去
+
   const inView = S.events.filter(e => parse(e.end) > top && parse(e.start) < bottom);
-  if (inView.length) return;
-  const later = S.events.find(e => parse(e.start) >= bottom);
-  if (later) {
-    box.scrollTop = Math.max(0, (parse(later.start) - dayStart) / 3600000 * PXH - 40);
+  if (!inView.length) {
+    const earlier = [...S.events].reverse().find(e => parse(e.end) <= top);
+    if (earlier) {
+      box.scrollTop = Math.max(0, (parse(earlier.start) - dayStart) / 3600000 * PXH - 40);
+      return;
+    }
   }
+  box.scrollTop = Math.max(0, (top - dayStart) / 3600000 * PXH);
 }
 
 /* ================= 时间轴 ================= */
@@ -1901,8 +1942,8 @@ function bindDropZone() {
     const t = timeFromY(e.clientY);
     dragItem = null;
     await call('/api/block/add', {
-      title: item.title, cat: item.cat,
-      taskId: item.kind === 'task' ? item.id : null,
+      title: item.title, kind: item.kind,
+      taskId: item.src === 'task' ? item.id : null,
       start: T(t), minutes: item.estMin || item.minutes || DEFAULT_MIN,
     });
     await load();
@@ -1976,7 +2017,7 @@ function bindBlock(el, ev) {
 function openPop(ev, el) {
   popBlock = ev;
   const pop = $('pop');
-  const c = catOf(ev.cat);
+  const c = kindOf(ev.kind);
   const s = parse(ev.start), e = parse(ev.end || ev.start);
   const act0 = actualOf(ev);
   const running = isRunning(ev.id);
@@ -1990,8 +2031,8 @@ function openPop(ev, el) {
       <span>→</span>
       <input type="time" id="pop-end" value="${hhmm(e)}">
     </div>
-    <div class="catsel" id="pop-cats">
-      ${CATS.map(x => `<button data-cat="${x.key}" class="${x.key===normC(ev.cat)?'on':''}"
+    <div class="kindbar" id="pop-kinds">
+      ${KINDS.map(x => `<button data-kind="${x.key}" class="${x.key===normK(ev.kind)?'on':''}"
           style="--c:${x.color};--s:${x.soft}"><span class="e">${x.emoji}</span>${x.name}</button>`).join('')}
     </div>
     <div class="pactual">
@@ -2027,9 +2068,9 @@ function openPop(ev, el) {
   pop.style.top = top + 'px';
 
   pop.querySelectorAll('[data-act]').forEach(b => { b.onclick = () => act(b.dataset.act); });
-  pop.querySelectorAll('[data-cat]').forEach(b => {
+  pop.querySelectorAll('[data-kind]').forEach(b => {
     b.onclick = async () => {
-      await call('/api/block/update', { id: ev.id, cat: b.dataset.cat });
+      await call('/api/block/update', { id: ev.id, kind: b.dataset.kind });
       closePop(); await load();
     };
   });
@@ -2138,7 +2179,7 @@ function paintTimer(now) {
   if (!t) { el.classList.remove('on'); return; }
   el.classList.add('on');
 
-  const c = catOf(t.cat);
+  const c = kindOf(t.kind);
   el.style.setProperty('--c', c.color);
   $('tm-em').textContent = c.emoji;
   $('tm-name').textContent = t.title;
@@ -2253,7 +2294,7 @@ document.addEventListener('pointerdown', e => {
   closePop();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') { closePop(); closeSheet(); closePomo(); closeHurry(); closeCuts(); }
+  if (e.key === 'Escape') { closePop(); closeSheet(); closeHurry(); closeCuts(); }
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); doUndo(); }
   const tag = (document.activeElement || {}).tagName;
   if (e.key === 'n' && !e.ctrlKey && !e.metaKey && tag !== 'INPUT' && tag !== 'TEXTAREA') {
@@ -2269,7 +2310,7 @@ function render() {
   renderFit(new Date());
   renderTimeline();
   renderSide();
-  if (render._day !== S.anchor) { render._day = S.anchor; scrollToNow(); }
+  if (render._day !== S.anchor) { render._day = S.anchor; scrollToView(); }
   if ($('ov').classList.contains('on')) renderStats();
 }
 
@@ -2346,8 +2387,12 @@ function renderFit(now) {
 
   /* ---- 看的是别的日子：昨天回看 / 明天预排 ---- */
   if (!S.isToday) {
-    const win = (cutAt(dayStart, 18) - dayStart) / 60000;   // 09:00–18:00 一共多少分钟
-    const past = cutAt(dayStart, 18) < now;
+    // 能用的时段 = 第一个截止点到最后一个截止点，默认就是 18:00–24:00 那段生意时间
+    const pts = cutPoints();
+    const wFrom = pts[0], wTo = pts[pts.length - 1];
+    const win = (wTo - wFrom) / 60000;
+    const winTxt = `${cutLabel(wFrom)}–${cutLabel(wTo)}`;
+    const past = wFrom < now;
     let left = 0;
     for (const e of S.events) {
       if (e.done) continue;
@@ -2371,11 +2416,11 @@ function renderFit(now) {
     el.classList.toggle('tight', left > 0 && diff >= 0 && diff < 60);
     $('fit-left').innerHTML = left > 0 ? `这天要干 <b>${fmtDur(left)}</b>` : '这天还什么都没排';
     $('fit-right').innerHTML = diff < 0
-      ? `09:00–18:00 只有 <b>${fmtDur(win)}</b> · 排多了 <b>${fmtDur(-diff)}</b>`
-      : `09:00–18:00 有 <b>${fmtDur(win)}</b> · 富余 <b>${fmtDur(diff)}</b>`;
+      ? `${winTxt} 只有 <b>${fmtDur(win)}</b> · 排多了 <b>${fmtDur(-diff)}</b>`
+      : `${winTxt} 有 <b>${fmtDur(win)}</b> · 富余 <b>${fmtDur(diff)}</b>`;
     $('fit-bar-i').style.width =
       (left > 0 ? Math.max(2, Math.min(100, left / win * 100)) : 0) + '%';
-    el.title = '按 09:00–18:00 这一天能用的时间算的';
+    el.title = `按 ${winTxt} 这段能用的时间算的（截止点在设置里改）`;
     return;
   }
 
@@ -2475,7 +2520,7 @@ function renderTimeline() {
 
   for (const it of items) {
     const e = it.e;
-    const c = catOf(e.cat);
+    const c = kindOf(e.kind);
     const top = Math.max(0, (it.s - dayStart) / 3600000 * PXH);
     const h = Math.max(9, (Math.min(it.en, dayEnd) - Math.max(it.s, dayStart)) / 3600000 * PXH);
     const el = document.createElement('div');
@@ -2537,13 +2582,13 @@ function renderTodo(box) {
   const open = S.tasks.filter(t => !t.done);
   const done = S.tasks.filter(t => t.done);
 
-  for (const c of CATS) {
-    const list = open.filter(t => normC(t.cat) === c.key);
+  for (const c of KINDS) {
+    const list = open.filter(t => normK(t.kind) === c.key);
     if (!list.length) continue;
     box.appendChild(groupHead(c, list.length, c.key));
     list.forEach(t => box.appendChild(todoRow(t, c)));
   }
-  const rest = open.filter(t => normC(t.cat) === 'other');
+  const rest = open.filter(t => normK(t.kind) === 'other');
   if (rest.length) {
     box.appendChild(groupHead(OTHER, rest.length, 'other'));
     rest.forEach(t => box.appendChild(todoRow(t, OTHER)));
@@ -2562,7 +2607,7 @@ function renderTodo(box) {
     h.style.marginTop = '14px';
     h.innerHTML = `<span class="gname" style="color:#B3A99C">已完成 ${done.length}</span>`;
     box.appendChild(h);
-    done.slice(0, 20).forEach(t => box.appendChild(todoRow(t, catOf(t.cat), true)));
+    done.slice(0, 20).forEach(t => box.appendChild(todoRow(t, kindOf(t.kind), true)));
   }
 }
 
@@ -2604,7 +2649,7 @@ function todoRow(t, c, isDoneSection) {
   if (sc) sc.onclick = e => {
     e.stopPropagation();
     if (window.MOBILE_SCHEDULE) {
-      window.MOBILE_SCHEDULE({ kind: 'task', id: t.id, title: t.title, cat: normC(t.cat), estMin: t.estMin });
+      window.MOBILE_SCHEDULE({ src: 'task', id: t.id, title: t.title, kind: normK(t.kind), estMin: t.estMin });
     }
   };
 
@@ -2626,7 +2671,7 @@ function todoRow(t, c, isDoneSection) {
   if (!isDoneSection) {
     el.draggable = true;
     el.addEventListener('dragstart', e => {
-      dragItem = { kind:'task', id:t.id, title:t.title, cat:normC(t.cat), estMin:t.estMin };
+      dragItem = { src:'task', id:t.id, title:t.title, kind:normK(t.kind), estMin:t.estMin };
       el.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'copyMove';
       e.dataTransfer.setData('text/plain', t.title);
@@ -2637,8 +2682,8 @@ function todoRow(t, c, isDoneSection) {
       clearDropMarks();
     });
     el.addEventListener('dragover', e => {
-      if (!dragItem || dragItem.kind !== 'task') return;
-      if (dragItem.cat !== normC(t.cat) || dragItem.id === t.id) return;
+      if (!dragItem || dragItem.src !== 'task') return;
+      if (dragItem.kind !== normK(t.kind) || dragItem.id === t.id) return;
       e.preventDefault();
       clearDropMarks();
       el.classList.add('drop-target');
@@ -2647,17 +2692,17 @@ function todoRow(t, c, isDoneSection) {
     el.addEventListener('drop', async e => {
       e.preventDefault();
       clearDropMarks();
-      if (!dragItem || dragItem.kind !== 'task' || dragItem.cat !== normC(t.cat)) return;
-      const cat = normC(t.cat);
+      if (!dragItem || dragItem.src !== 'task' || dragItem.kind !== normK(t.kind)) return;
+      const kind = normK(t.kind);
       const draggedId = dragItem.id;
-      const list = S.tasks.filter(x => normC(x.cat) === cat && !x.done).map(x => x.id);
+      const list = S.tasks.filter(x => normK(x.kind) === kind && !x.done).map(x => x.id);
       const from = list.indexOf(draggedId);
       const to = list.indexOf(t.id);
       dragItem = null;
       if (from === -1 || to === -1 || from === to) return;
       list.splice(from, 1);
       list.splice(to, 0, draggedId);
-      await call('/api/task/reorder', { cat, ids: list });
+      await call('/api/task/reorder', { kind, ids: list });
       await load();
     });
   }
@@ -2674,7 +2719,7 @@ function renderTray(box) {
     chips.innerHTML = '<div class="empty-note" style="width:100%">托盘是空的<br>把每天固定要做的事放这儿，拖进时间轴就行</div>';
   }
   for (const t of S.tray) {
-    const c = catOf(t.cat);
+    const c = kindOf(t.kind);
     const el = document.createElement('div');
     el.className = 'chip' + (t.onToday ? ' on-day' : '');
     el.style.setProperty('--c', c.color);
@@ -2683,7 +2728,7 @@ function renderTray(box) {
       <span class="mm num">${fmtDur(t.minutes)}</span><button class="sched" title="排到时间轴">📅</button><button class="x" title="删掉">✕</button>`;
     el.title = t.onToday ? `${t.title}\n今天已经排过了` : `${t.title}\n拖进时间轴 = 排进今天`;
     el.addEventListener('dragstart', e => {
-      dragItem = { kind:'tray', id:t.id, title:t.title, cat:normC(t.cat), minutes:t.minutes };
+      dragItem = { src:'tray', id:t.id, title:t.title, kind:normK(t.kind), minutes:t.minutes };
       el.classList.add('dragging');
       e.dataTransfer.effectAllowed = 'copy';
       e.dataTransfer.setData('text/plain', t.title);
@@ -2694,7 +2739,7 @@ function renderTray(box) {
     if (tsc) tsc.onclick = e => {
       e.stopPropagation();
       if (window.MOBILE_SCHEDULE) {
-        window.MOBILE_SCHEDULE({ kind: 'tray', id: t.id, title: t.title, cat: normC(t.cat), minutes: t.minutes });
+        window.MOBILE_SCHEDULE({ src: 'tray', id: t.id, title: t.title, kind: normK(t.kind), minutes: t.minutes });
       }
     };
     el.querySelector('.x').onclick = async e => {
@@ -2727,7 +2772,7 @@ function renderIdea(box, draft) {
     list.innerHTML = '<div class="empty-note">灵感箱还空着<br><span style="font-size:11px;color:#C8BCAC">随手一句话就行，不用想结构</span></div>';
   }
   S.ideas.forEach((it, i) => {
-    const c = it.cat ? catOf(it.cat) : null;
+    const c = it.kind ? kindOf(it.kind) : null;
     const el = document.createElement('div');
     el.className = 'note' + (it.pinned ? ' pinned' : '');
     el.style.transform = `rotate(${(i % 3 - 1) * 0.6}deg)`;
@@ -2791,9 +2836,9 @@ function renderStats() {
 }
 
 function cardByCat(d) {
-  const items = d.byCat.items;
+  const items = d.byKind.items;
   if (!items.length) {
-    return `<div class="card"><h3>四类时长占比<span>${d.label}</span></h3>
+    return `<div class="card"><h3>子类别时长占比<span>${d.label}</span></h3>
       <div class="empty-note">这个时间段还没有排任何日程</div></div>`;
   }
   const stack = items.map(i => `<i style="width:${i.pct}%;background:${i.color}"></i>`).join('');
@@ -2806,7 +2851,7 @@ function cardByCat(d) {
       <span class="tm num">${fmtDur(i.minutes)}</span>
     </div>`).join('');
   return `<div class="card">
-    <h3>四类时长占比<span>${d.label} · 共 ${fmtDur(d.byCat.total)}</span></h3>
+    <h3>子类别时长占比<span>${d.label} · 共 ${fmtDur(d.byKind.total)}</span></h3>
     <div class="stack">${stack}</div>${rows}
   </div>`;
 }
@@ -2862,8 +2907,8 @@ function cardTrend(d) {
   const cols = t.map((w, i) => {
     const x = padL + i * (bw + gap);
     let y = H - padB;
-    const segs = ALL.filter(c => w.cats[c.key]).map(c => {
-      const h = w.cats[c.key] / max * (H - padB - 14);
+    const segs = ALL.filter(c => w.kinds[c.key]).map(c => {
+      const h = w.kinds[c.key] / max * (H - padB - 14);
       y -= h;
       return `<rect x="${x}" y="${y}" width="${bw}" height="${Math.max(h,0.6)}" fill="${c.color}" rx="3"/>`;
     }).join('');
@@ -2875,7 +2920,7 @@ function cardTrend(d) {
       <line x1="0" y1="${H-padB}" x2="${W}" y2="${H-padB}" stroke="#F1E8DE" stroke-width="1"/>
       ${cols}
     </svg>
-    <div class="legend">${ALL.filter(c => t.some(w => w.cats[c.key]))
+    <div class="legend">${ALL.filter(c => t.some(w => w.kinds[c.key]))
       .map(c => `<span><i style="background:${c.color}"></i>${c.name}</span>`).join('')}</div>
   </div>`;
 }
@@ -2888,7 +2933,7 @@ function cardByTask(d) {
   }
   const max = Math.max(...list.map(x => Math.max(x.minutes, x.actual || 0)));
   const rows = list.map(x => {
-    const c = catOf(x.cat);
+    const c = kindOf(x.kind);
     const act = x.actual || 0;
     const gap = act - x.minutes;
     return `<div class="trow" title="${esc(x.title)}\n计划 ${fmtDur(x.minutes)} · 实际 ${fmtDur(act)}`
@@ -2902,7 +2947,7 @@ function cardByTask(d) {
     </div>`;
   }).join('');
   return `<div class="card">
-    <h3>每个任务：计划 / 实际<span>${d.label} · 最花时间的事</span></h3>
+    <h3>每件事：计划 / 实际<span>${d.label} · 最花时间的事</span></h3>
     <div class="trow head"><span class="em"></span><span class="nm"></span>
       <span class="fill"></span><span class="tm">计划</span><span class="tm2">实际</span></div>
     ${rows}
@@ -2910,21 +2955,23 @@ function cardByTask(d) {
 }
 
 /* ================= 添加 / 编辑 面板 ================= */
-function openSheet(mode, task, presetCat, slot) {
-  sheetCtx = { mode, task: task || null, cat: task ? normC(task.cat) : (presetCat || 'biz'), slot: slot || null };
+function openSheet(mode, task, presetKind, slot) {
+  sheetCtx = { mode, task: task || null, kind: task ? normK(task.kind) : (presetKind || 'talk'), slot: slot || null };
   const t = task;
   const isTray = mode === 'tray';
+  const fresh = !t;          // 新加的才自动带标题和时长，改老的不动
   let minVal = isTray ? 60 : DEFAULT_MIN;
   if (t) minVal = (isTray ? t.minutes : t.estMin) || minVal;
   $('sheet-in').innerHTML = `
     <h4>${t ? '改这条' : isTray ? '加一个固定日程'
       : slot ? `在 ${hhmm(slot)} 加一件事` : '加一条待办'}</h4>
-    <input class="sh-title" id="sh-title" placeholder="${isTray ? '比如：洗漱睡觉、复盘、会面' : '要做什么？'}"
+    <input class="sh-title" id="sh-title" placeholder="${isTray ? '比如：会面、复盘、回php' : '要做什么？'}"
            value="${t ? esc(t.title) : ''}" maxlength="120">
-    <div class="catsel" id="sh-cats">
-      ${CATS.map(c => `<button data-cat="${c.key}" class="${c.key===sheetCtx.cat?'on':''}"
+    <div class="kindbar" id="sh-kinds">
+      ${KINDS.map(c => `<button data-kind="${c.key}" class="${c.key===sheetCtx.kind?'on':''}"
           style="--c:${c.color};--s:${c.soft}"><span class="e">${c.emoji}</span>${c.name}</button>`).join('')}
     </div>
+    <div class="kindtip">点上面那排 = 连标题和时长一起填上</div>
     <div class="footrow">
       <span class="flabel">${isTray ? '默认' : '预计'}</span>
       <div class="stepper">
@@ -2950,10 +2997,16 @@ function openSheet(mode, task, presetCat, slot) {
     el.value = Math.max(15, Math.round((Number(el.value) || 0) / 15) * 15);
   });
 
-  $('sh-cats').querySelectorAll('button').forEach(b => {
+  $('sh-kinds').querySelectorAll('button').forEach(b => {
     b.onclick = () => {
-      sheetCtx.cat = b.dataset.cat;
-      $('sh-cats').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      sheetCtx.kind = b.dataset.kind;
+      $('sh-kinds').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+      if (!fresh) return;
+      // 新加的时候点一下就把标题和时长带上，省得再打一遍
+      const k = KIND_MAP[b.dataset.kind];
+      const title = $('sh-title');
+      if (k && !title.value.trim()) title.value = k.name;
+      if (k && k.min) $('sh-min').value = k.min;
     };
   });
   $('sh-save').onclick = saveSheet;
@@ -2965,21 +3018,21 @@ async function saveSheet() {
   const title = $('sh-title').value.trim();
   if (!title) { $('sh-title').focus(); return; }
   const min = Number($('sh-min').value) || DEFAULT_MIN;
-  const { mode, task, cat, slot } = sheetCtx;
+  const { mode, task, kind, slot } = sheetCtx;
   if (mode === 'tray') {
-    if (task) await call('/api/tray/update', { id: task.id, title, cat, minutes: min });
-    else await call('/api/tray/add', { title, cat, minutes: min });
+    if (task) await call('/api/tray/update', { id: task.id, title, kind, minutes: min });
+    else await call('/api/tray/add', { title, kind, minutes: min });
   } else {
     let taskId = task ? task.id : null;
-    if (task) await call('/api/task/update', { id: task.id, title, cat, estMin: min });
+    if (task) await call('/api/task/update', { id: task.id, title, kind, estMin: min });
     else {
-      const r = await call('/api/task/add', { title, cat, estMin: min });
+      const r = await call('/api/task/add', { title, kind, estMin: min });
       taskId = r.id || null;
     }
     // 从时间轴空白处双击进来的，顺手把日程也排上
     if (slot) {
       await call('/api/block/add', {
-        title, cat, taskId,
+        title, kind, taskId,
         start: T(slot), minutes: min,
       });
     }
@@ -3033,6 +3086,10 @@ $('day-prev').onclick = () => { if (S) gotoDay(S.prevDay); };
 $('day-next').onclick = () => { if (S) gotoDay(S.nextDay); };
 $('day-today').onclick = () => gotoDay(null);
 
+// 收起 / 展开。手机版收起时标签栏还留着，所以这个按钮得能来回切
+$('side-fold').onclick = () => setSide(!document.body.classList.contains('side-collapsed'));
+$('side-open-btn').onclick = () => setSide(false);
+
 /* ---- 改「到几点干不干得完」的截止时间 ---- */
 let cutDraft = [18, 24];
 const fmtHour = h => (Number(h) >= 24 || Number(h) === 0) ? '24:00' : `${p2(Number(h))}:00`;
@@ -3065,16 +3122,6 @@ $('cut-save').onclick = async () => {
   toast('截止时间改好了');
 };
 
-/* ---- 番茄钟：别人的现成页面，塞在 iframe 里 ---- */
-function openPomo() {
-  const f = $('pomo-frame');
-  const src = f.getAttribute('src');
-  if (!src || src === 'about:blank') f.src = '/pomodoro/';
-  $('pomo').classList.add('on');
-}
-const closePomo = () => $('pomo').classList.remove('on');
-$('pomo-btn').onclick = openPomo;
-$('pomo-back').onclick = closePomo;
 $('ov-seg').querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
   $('ov-seg').querySelectorAll('button').forEach(x => x.classList.remove('on'));
   b.classList.add('on');
@@ -3128,24 +3175,12 @@ load();
 (function () {
   const $ = id => document.getElementById(id);
 
-  /* ================= 1. 底部面板：点标签展开 / 再点收起 ================= */
-  // 初始状态在 mobile-api.js 里就定好了（要赶在时间轴算高度之前）
-  const SIDE_KEY = 'desk.sideOpen';
-
-  let wasSameTab = false;
-  $('side-tabs').addEventListener('pointerdown', e => {
-    const b = e.target.closest('.stab');
-    wasSameTab = !!b && pane === b.dataset.pane;
-  }, true);
-
+  /* ================= 1. 收起 / 展开 ================= */
+  // 收起按钮和状态都在 app.html 里（↓ / ↑），这里只补一件事：
+  // 收起状态下点标签 = 直接展开，省得再去戳那个小箭头
   $('side-tabs').querySelectorAll('.stab').forEach(b => {
     b.addEventListener('click', () => {
-      const open = document.body.classList.contains('side-open');
-      const next = !(wasSameTab && open);
-      document.body.classList.toggle('side-open', next);
-      try { localStorage.setItem(SIDE_KEY, next ? '1' : '0'); } catch { }
-      // 面板高度变了，时间轴要重算每小时的像素
-      setTimeout(() => { if (S) { layout(); renderTimeline(); } }, 260);
+      if (document.body.classList.contains('side-collapsed')) setSide(false);
     });
   });
 
@@ -3187,7 +3222,7 @@ load();
       const it = schedItem;
       closeSched();
       if (!it) return;
-      if (it.kind === 'task') {
+      if (it.src === 'task') {
         await startTimer({ taskId: it.id });
       } else {
         const r = await call('/api/block/add', {
@@ -3241,7 +3276,7 @@ load();
     closeSched();
     await call('/api/block/add', {
       title: it.title, cat: it.cat,
-      taskId: it.kind === 'task' ? it.id : null,
+      taskId: it.src === 'task' ? it.id : null,
       start: T(d), minutes: it.estMin || it.minutes || DEFAULT_MIN,
     });
     await load();
@@ -3324,15 +3359,7 @@ load();
     };
   }
 
-  /* ================= 4. 番茄钟：同一份别人的代码，放隔壁页面里 ================= */
-  $('pomo-btn').onclick = () => {
-    const f = $('pomo-frame');
-    const src = f.getAttribute('src');
-    if (!src || src === 'about:blank') f.src = 'pomodoro.html';
-    $('pomo').classList.add('on');
-  };
-
-  /* ================= 5. 离线缓存（只在 https 或 localhost 下有效） ================= */
+  /* ================= 4. 离线缓存（只在 https 或 localhost 下有效） ================= */
   if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('sw.js').catch(() => { });
