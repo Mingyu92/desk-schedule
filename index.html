@@ -723,6 +723,11 @@ body.side-collapsed .side-open-btn{ display:none; }
 
 
 
+/* ---- 时间轴：手机上手指要能直接滚，别被日程块吃掉 ---- */
+.ev{ touch-action:auto; cursor:pointer; }
+.ev:hover{ transform:none; }
+.ev .rz{ display:none; }
+
 /* ---- 行高、点击区域放大 ---- */
 .row{ padding:9px 9px; margin-bottom:5px; }
 .row .txt{ font-size:13px; }
@@ -1498,6 +1503,10 @@ return { KINDS, OTHER, ALL_KINDS, normKind, T, parseT, frame, anchorOf, dayKey, 
   const CORE = window.CORE;
   const KEY = 'desk.schedule.v1';
 
+  // 给 app.html 用的开关：手机版关掉时间轴上「拖着改时间」那套。
+  // 手指本来想滚时间轴，一按到日程块上就把它拖走了 —— 手机上只留点开。
+  window.DESK_MOBILE = true;
+
   function read() {
     try {
       const raw = localStorage.getItem(KEY);
@@ -1937,8 +1946,21 @@ function timeFromY(clientY) {
   return new Date(parse(S.dayStart).getTime() + min * 60000);
 }
 
-/* ================= 已有日程块：拖动 / 拉长 / 点开 ================= */
+/* ================= 已有日程块：拖动 / 拉长 / 点开 =================
+   手机上不拖 —— 手指本来想滚时间轴，一按到块上就把它拖走了
+   （.ev 上有 touch-action:none，压根滚不动）。
+   手机上只留点开，改时间走面板里的时间框和「早/晚/长/短」那几个按钮。
+--------------------------------------------------------------- */
 function bindBlock(el, ev) {
+  if (window.DESK_MOBILE) {
+    el.addEventListener('click', e => {
+      if (!S) return;
+      e.stopPropagation();
+      openPop(ev, el);
+    });
+    return;
+  }
+
   el.addEventListener('pointerdown', e => {
     if (e.button !== 0 || !S) return;
     const mode = e.target.classList.contains('rz') ? 'resize' : 'move';
@@ -2529,7 +2551,7 @@ function renderTimeline() {
       <div class="rz"></div>`;
     el.title = `${hhmm(it.s)}–${hhmm(it.en)} ${e.title}\n计划 ${fmtDur((it.en - it.s) / 60000)}`
       + (act >= 1 ? ` · 实际 ${fmtDur(act)}` : ' · 还没开始计时')
-      + `\n拖动改时间 · 拉底边改时长 · 点一下打开菜单`;
+      + (window.DESK_MOBILE ? `\n点一下打开菜单` : `\n拖动改时间 · 拉底边改时长 · 点一下打开菜单`);
     bindBlock(el, e);
     tl.appendChild(el);
   }
