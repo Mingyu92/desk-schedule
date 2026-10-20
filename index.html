@@ -223,7 +223,7 @@
 
   /* ---- 右侧面板 ---- */
   .side{
-    width:264px; flex:none; display:flex; flex-direction:column; min-height:0;
+    width:296px; flex:none; display:flex; flex-direction:column; min-height:0;
     border-left:1px solid var(--line); background:rgba(255,255,255,.55);
     position:relative; transition:width .22s var(--bounce);
   }
@@ -276,9 +276,10 @@
   }
   .row:hover{transform:translateY(-1px); box-shadow:0 5px 14px rgba(130,96,64,.13);}
   .row .grip{color:#D5C9B9; font-size:11px; flex:none;}
-  .row .bar{width:3px; height:15px; border-radius:2px; flex:none; background:var(--c);}
-  .row .txt{flex:1; min-width:0; font-size:12.5px; line-height:1.35; cursor:text;
-            overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .row .bar{width:3px; align-self:stretch; min-height:15px; border-radius:2px; flex:none; background:var(--c);}
+  /* 标题不截断 —— 换行显示全，行高跟着长 */
+  .row .txt{flex:1; min-width:0; font-size:12.5px; line-height:1.4; cursor:text;
+            overflow-wrap:anywhere; word-break:break-word;}
   .row .est{font-size:10.5px; color:var(--ink3); flex:none;}
   .row .at{font-size:10px; color:#fff; background:var(--c); flex:none;
            padding:1px 5px; border-radius:6px; font-weight:600; opacity:.85;}
@@ -453,6 +454,25 @@
   .vs-item .pa{flex:none; font-size:10.5px; color:var(--ink3); font-variant-numeric:tabular-nums;}
   .vs-item .df{flex:none; min-width:52px; text-align:right; font-size:10.5px; padding:1px 7px;
                border-radius:7px; font-variant-numeric:tabular-nums;}
+
+  /* ---- 两条时间轴：左计划 / 右实际，同一位置比高度 ---- */
+  .vt-head{display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-left:40px;
+           font-size:10.5px; color:var(--ink3); text-align:center; padding-bottom:6px;}
+  .vt{position:relative; padding-left:40px;}
+  .vt-lines{position:absolute; left:40px; right:0; top:0; bottom:0; pointer-events:none;}
+  .vt-hour{position:absolute; left:0; right:0; border-top:1px dashed var(--line);}
+  .vt-hour i{position:absolute; left:-40px; top:-7px; width:33px; text-align:right;
+             font-style:normal; font-size:10px; color:var(--ink3);}
+  .vt-cols{display:grid; grid-template-columns:1fr 1fr; gap:7px; height:100%;}
+  .vt-col{position:relative;}
+  .vt-ev{position:absolute; left:0; right:0; border-radius:7px; overflow:hidden;
+         padding:2px 5px; font-size:10.5px; line-height:1.22;}
+  .vt-ev .t{display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .vt-ev .m{display:block; font-size:9.5px; opacity:.82; font-variant-numeric:tabular-nums;}
+  .vt-ev.plan{background:var(--s); border-left:3px solid var(--c); color:#3A342E;}
+  .vt-ev.act{background:var(--c); color:#fff;}
+  .vt-ev.ghost{border:1.5px dashed #DCD2C4; background:transparent; color:#C4B8A8;}
+  .vt-note{margin-top:10px; font-size:10.5px; color:#C4B8A8; line-height:1.55;}
 
   .vdays{display:flex; justify-content:space-between; align-items:flex-end; gap:2px;}
   .vdays .vday{border-radius:9px; padding:2px 0 0; transition:background .15s;}
@@ -1128,7 +1148,7 @@ function vsStats(db, from, to) {
     if (plan <= 0) continue;
     const actual = Math.round(actualMinutesOf(b, now));
     rows.push({
-      id: b.id, title: b.title, kind: normKind(b.kind), start: b.start,
+      id: b.id, title: b.title, kind: normKind(b.kind), start: b.start, end: b.end,
       plan, actual, diff: actual - plan, done: !!b.done, timed: actual > 0,
     });
   }
@@ -1167,6 +1187,9 @@ function vsStats(db, from, to) {
     under: { n: under.length, min: Math.round(under.reduce((s, r) => s + r.diff, 0)) },
     onTime: onTime, avgAbs,
     byKind,
+    // 全部块，按开始时间排 —— 「两条时间轴」那张卡用它画
+    // （worst 只留偏差最大的 30 条，画轴会漏）
+    timeline: rows,
     // 偏差最大的排前面 —— 这一页就是来看「哪儿排得不准」的
     worst: [...timed].sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff)).slice(0, 30),
   };
@@ -2954,6 +2977,77 @@ function vsLine(label, val, max, color) {
     <span class="vl">${val > 0 ? fmtDur(val) : '—'}</span></div>`;
 }
 
+/* ---- 两条时间轴：左 = 计划，右 = 实际，同一纵向位置比高度 ----
+   数据里只记了「实际做了多少分钟」（actualMin），没记「实际几点做的」，
+   所以右边画在跟左边同一个位置、高度按实际时长 —— 一眼看出哪块排多了。
+   没计过时的块，右边留一个虚线空框，位置和左边对齐。
+   只对「今天」出这张卡 —— 本周/本月跨好几天，画成一条轴没意义。
+   （这是从电脑版搬过来的；手机版还是七个子类别，所以字段是 kind 不是 cat）
+--------------------------------------------------------------- */
+function cardVsTimeline(v) {
+  const rows = v.timeline || [];
+  if (!rows.length) return '';
+  const HOUR = 34;                    // 每小时多少像素 —— 够高才塞得下标题
+  const MINH = 16;                    // 实际块最矮也留这么高，不然标题看不见
+  let lo = Infinity, hi = -Infinity;
+  for (const r of rows) {
+    lo = Math.min(lo, parse(r.start).getTime());
+    hi = Math.max(hi, parse(r.end || r.start).getTime());
+  }
+  // 前后各留半小时、对齐到整点；至少铺 6 小时，免得只有一两件事时挤成一团
+  lo = Math.floor((lo - 30 * 60000) / 3600000) * 3600000;
+  hi = Math.ceil((hi + 30 * 60000) / 3600000) * 3600000;
+  if (hi - lo < 6 * 3600000) hi = lo + 6 * 3600000;
+
+  const totalH = (hi - lo) / 3600000;
+  const H = totalH * HOUR;
+  const yOf = t => (parse(t).getTime() - lo) / 3600000 * HOUR;
+
+  let hours = '';
+  for (let i = 0; i <= totalH; i++) {
+    const h = new Date(lo + i * 3600000);
+    hours += `<div class="vt-hour" style="top:${i * HOUR}px"><i class="num">${p2(h.getHours())}</i></div>`;
+  }
+
+  const bar = (r, mode) => {
+    const c = kindOf(r.kind);
+    const top = yOf(r.start);
+    const tip = `${esc(r.title)}&#10;计划 ${fmtDur(r.plan)} · 实际 ${r.timed ? fmtDur(r.actual) : '没计时'}`
+      + (r.done ? '&#10;✓ 已标完成' : '');
+    if (mode === 'act' && !r.timed) {
+      return `<div class="vt-ev ghost" title="${tip}"
+        style="top:${top}px;height:${Math.max(MINH, r.plan / 60 * HOUR)}px">
+        <span class="t">${esc(r.title)}</span></div>`;
+    }
+    const min = mode === 'plan' ? r.plan : r.actual;
+    // 实际块给个下限，否则 20 分钟那种只剩一条线，标题根本看不见
+    const h = Math.max(mode === 'act' ? MINH : 12, min / 60 * HOUR);
+    const tick = (mode === 'act' && r.done) ? '✓ ' : '';
+    const body = h >= 30
+      ? `<span class="t">${tick}${esc(r.title)}</span><span class="m">${fmtDur(min)}</span>`
+      : `<span class="t">${tick}${esc(r.title)}</span>`;
+    return `<div class="vt-ev ${mode}" title="${tip}"
+      style="top:${top}px;height:${h}px;--c:${c.color};--s:${c.soft}">${body}</div>`;
+  };
+
+  const planMin = rows.reduce((s, r) => s + r.plan, 0);
+  const actMin = rows.reduce((s, r) => s + r.actual, 0);
+
+  return `<div class="card">
+    <h3>计划 / 实际 两条时间轴<span>${fmtDur(planMin)} → ${fmtDur(actMin)}</span></h3>
+    <div class="vt-head"><span>计划</span><span>实际</span></div>
+    <div class="vt" style="height:${H}px">
+      <div class="vt-lines">${hours}</div>
+      <div class="vt-cols">
+        <div class="vt-col">${rows.map(r => bar(r, 'plan')).join('')}</div>
+        <div class="vt-col">${rows.map(r => bar(r, 'act')).join('')}</div>
+      </div>
+    </div>
+    <div class="vt-note">右边只画真计过时的块，没计过时的留虚线框。高度按实际时长算，
+      所以右边比左边矮 = 排多了，高出来 = 超时。</div>
+  </div>`;
+}
+
 function renderVsCards() {
   const box = $('vs-body');
   if (statsLoading || !statsData || !statsData.vs) { box.innerHTML = '<div class="card">读取中…</div>'; return; }
@@ -3056,7 +3150,9 @@ function renderVsCards() {
     }).join('')}
   </div>` : '';
 
-  box.innerHTML = [card1, card4, card2, card3, card5].join('');
+  // 两条时间轴只在「今天」出 —— 本周/本月跨好几天，一条轴画不下
+  const cardVs = d.range === 'today' ? cardVsTimeline(v) : '';
+  box.innerHTML = [card1, cardVs, card4, card2, card3, card5].join('');
 }
 
 function cardByCat(d) {
